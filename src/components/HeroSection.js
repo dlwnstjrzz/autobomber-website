@@ -40,7 +40,7 @@ export default function HeroSection() {
       <div className="relative z-10 w-full max-w-3xl mx-auto px-8 mt-12">
         <div className="flex flex-col sm:flex-row gap-6 justify-center">
           {/* Mac 다운로드 버튼 */}
-          <button className="flex-1 bg-gradient-to-r from-gray-900 via-black to-gray-900 hover:from-gray-800 hover:via-gray-900 hover:to-gray-800 text-white py-6 px-8 rounded-2xl font-bold text-lg transition-colors duration-300 flex items-center justify-center space-x-4 border-2 border-gray-700 hover:border-gray-600">
+          <button className="cursor-pointer flex-1 bg-gradient-to-r from-gray-900 via-black to-gray-900 hover:from-gray-800 hover:via-gray-900 hover:to-gray-800 text-white py-6 px-8 rounded-2xl font-bold text-lg transition-colors duration-300 flex items-center justify-center space-x-4 border-2 border-gray-700 hover:border-gray-600">
             <FaApple className="w-7 h-7 text-gray-300" />
             <div className="flex flex-col items-start">
               <span className="text-sm text-gray-400">Download for</span>
@@ -49,7 +49,7 @@ export default function HeroSection() {
           </button>
 
           {/* Windows 다운로드 버튼 */}
-          <button className="flex-1 bg-gradient-to-r from-gray-800 via-gray-900 to-black hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 text-white py-6 px-8 rounded-2xl font-bold text-lg transition-colors duration-300 flex items-center justify-center space-x-4 border-2 border-gray-600 hover:border-gray-500">
+          <button className="cursor-pointer flex-1 bg-gradient-to-r from-gray-800 via-gray-900 to-black hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 text-white py-6 px-8 rounded-2xl font-bold text-lg transition-colors duration-300 flex items-center justify-center space-x-4 border-2 border-gray-600 hover:border-gray-500">
             <FaWindows className="w-7 h-7 text-gray-300" />
             <div className="flex flex-col items-start">
               <span className="text-sm text-gray-400">Download for</span>

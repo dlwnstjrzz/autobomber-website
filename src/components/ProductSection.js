@@ -23,7 +23,7 @@ export default function ProductSection() {
     router.push(`/purchase?plan=${planParam}`);
   };
   return (
-    <section className="py-16" style={{ backgroundColor: '#1a1a1a' }}>
+    <section className="py-16" style={{ backgroundColor: "#1a1a1a" }}>
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto bg-card rounded-2xl shadow-lg overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-8 p-12">
@@ -153,7 +153,7 @@ export default function ProductSection() {
               <div className="pt-6">
                 <button
                   onClick={handlePurchaseClick}
-                  className={`w-full py-4 px-6 rounded-lg font-semibold text-center transition-colors shadow-lg text-lg ${
+                  className={`cursor-pointer w-full py-4 px-6 rounded-lg font-semibold text-center transition-colors shadow-lg text-lg ${
                     selectedPlan === "trial"
                       ? "bg-green-600 text-white hover:bg-green-700"
                       : "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -173,7 +173,9 @@ export default function ProductSection() {
           {Array.from({ length: 20 }, (_, index) => (
             <div key={index + 1} className="w-full">
               <img
-                src={`/image/blog_automation/블로그 서이추 자동화 상세페이지 초안_${index + 1}.jpeg`}
+                src={`/image/blog_automation/블로그 서이추 자동화 상세페이지 초안_${
+                  index + 1
+                }.jpeg`}
                 alt={`상품 상세 이미지 ${index + 1}`}
                 className="w-full h-auto rounded-lg shadow-sm"
                 loading="lazy"
