@@ -34,14 +34,12 @@ export default function MarginCalculator() {
                   <div className="border-2 border-primary rounded-lg p-6 bg-primary/5">
                     <div className="text-center">
                       <div className="text-lg font-bold text-card-foreground mb-2">
-                        평생 이용권
+                        구매
                       </div>
                       <div className="text-3xl font-bold text-primary">
                         ₩19,900
                       </div>
-                      <div className="text-sm text-muted-foreground mt-2">
-                        한 번 구매로 평생 사용
-                      </div>
+                      <div className="text-sm text-muted-foreground mt-2"></div>
                     </div>
                   </div>
                 </div>
@@ -58,7 +56,9 @@ export default function MarginCalculator() {
                     </li>
                     <li className="flex items-center space-x-2">
                       <span className="w-2 h-2 bg-primary rounded-full"></span>
-                      <span>원가, 배송비, 카드 수수료 등 모든 비용 입력 가능</span>
+                      <span>
+                        원가, 배송비, 카드 수수료 등 모든 비용 입력 가능
+                      </span>
                     </li>
                     <li className="flex items-center space-x-2">
                       <span className="w-2 h-2 bg-primary rounded-full"></span>
@@ -109,20 +109,36 @@ export default function MarginCalculator() {
             </h3>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
-                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
-                <span className="text-muted-foreground">판매 채널 선택 (스마트스토어 / 쿠팡)</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                  1
+                </span>
+                <span className="text-muted-foreground">
+                  판매 채널 선택 (스마트스토어 / 쿠팡)
+                </span>
               </div>
               <div className="flex items-start space-x-3">
-                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
-                <span className="text-muted-foreground">판매가, 원가, 배송비 등 입력</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                  2
+                </span>
+                <span className="text-muted-foreground">
+                  판매가, 원가, 배송비 등 입력
+                </span>
               </div>
               <div className="flex items-start space-x-3">
-                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
-                <span className="text-muted-foreground">버튼 클릭 → 마진, 수익, 손익 구조 즉시 확인</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                  3
+                </span>
+                <span className="text-muted-foreground">
+                  버튼 클릭 → 마진, 수익, 손익 구조 즉시 확인
+                </span>
               </div>
               <div className="flex items-start space-x-3">
-                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">4</span>
-                <span className="text-muted-foreground">필요 시 가격 조정 후 재계산</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                  4
+                </span>
+                <span className="text-muted-foreground">
+                  필요 시 가격 조정 후 재계산
+                </span>
               </div>
             </div>
           </div>
@@ -143,11 +159,16 @@ export default function MarginCalculator() {
               </li>
               <li className="flex items-center space-x-2">
                 <span className="w-2 h-2 bg-primary rounded-full"></span>
-                <span>여러 상품을 동시에 분석해 효율적인 가격 전략을 세우고 싶은 판매자</span>
+                <span>
+                  여러 상품을 동시에 분석해 효율적인 가격 전략을 세우고 싶은
+                  판매자
+                </span>
               </li>
               <li className="flex items-center space-x-2">
                 <span className="w-2 h-2 bg-primary rounded-full"></span>
-                <span>이벤트/할인 적용 시 손익을 미리 확인하고 싶은 판매자</span>
+                <span>
+                  이벤트/할인 적용 시 손익을 미리 확인하고 싶은 판매자
+                </span>
               </li>
             </ul>
           </div>
@@ -159,20 +180,28 @@ export default function MarginCalculator() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <h4 className="font-semibold text-card-foreground">시간 절약</h4>
+                <h4 className="font-semibold text-card-foreground">
+                  시간 절약
+                </h4>
                 <p className="text-muted-foreground">수작업 계산 필요 없음</p>
               </div>
               <div className="space-y-2">
                 <h4 className="font-semibold text-card-foreground">정확성</h4>
-                <p className="text-muted-foreground">수수료, 배송비까지 반영된 실제 마진 확인</p>
+                <p className="text-muted-foreground">
+                  수수료, 배송비까지 반영된 실제 마진 확인
+                </p>
               </div>
               <div className="space-y-2">
                 <h4 className="font-semibold text-card-foreground">편리성</h4>
-                <p className="text-muted-foreground">단순한 입력으로 판매 전략 수립 가능</p>
+                <p className="text-muted-foreground">
+                  단순한 입력으로 판매 전략 수립 가능
+                </p>
               </div>
               <div className="space-y-2">
                 <h4 className="font-semibold text-card-foreground">확장성</h4>
-                <p className="text-muted-foreground">다양한 상품·판매 채널 분석 가능</p>
+                <p className="text-muted-foreground">
+                  다양한 상품·판매 채널 분석 가능
+                </p>
               </div>
             </div>
           </div>
@@ -184,11 +213,14 @@ export default function MarginCalculator() {
             </h3>
             <div className="space-y-4 text-muted-foreground">
               <p>
-                판매는 열심히 하는데 손에 남는 돈이 적다고 느낀다면,<br />
-                이제 스마트스토어·쿠팡 마진 계산기로 한눈에, 정확하게, 빠르게 내 수익 구조를 파악하세요.
+                판매는 열심히 하는데 손에 남는 돈이 적다고 느낀다면,
+                <br />
+                이제 스마트스토어·쿠팡 마진 계산기로 한눈에, 정확하게, 빠르게 내
+                수익 구조를 파악하세요.
               </p>
               <p className="font-semibold text-card-foreground">
-                이제는 가격 전략, 상품 전략, 이벤트 전략까지 손쉽게 관리하며,<br />
+                이제는 가격 전략, 상품 전략, 이벤트 전략까지 손쉽게 관리하며,
+                <br />
                 매출과 수익을 동시에 잡을 수 있습니다.
               </p>
             </div>
