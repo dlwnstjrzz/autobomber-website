@@ -3,6 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "next-themes";
 
 const pretendard = localFont({
   src: "../../static/fonts/PretendardVariable.woff2",
@@ -19,15 +21,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body className={`${pretendard.variable} antialiased font-pretendard`} suppressHydrationWarning={true}>
-        <AuthProvider>
-          <div className="min-h-screen bg-background text-foreground flex flex-col">
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <AuthProvider>
+            <div className="min-h-screen bg-background text-foreground flex flex-col">
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -11,17 +11,47 @@ import { auth, googleProvider } from "@/lib/firebase";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [firebaseUser, setFirebaseUser] = useState(null);
+  const [kakaoUser, setKakaoUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Firebase 사용자 상태 감시
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
+      setFirebaseUser(user);
 
+      if (user) {
+        // Firebase 사용자 정보를 쿠키에 저장
+        const userData = {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL
+        };
+        document.cookie = `firebase_user=${JSON.stringify(userData)}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`;
+        setLoading(false);
+      } else {
+        // Firebase 사용자가 없으면 쿠키 삭제 후 카카오 사용자 확인
+        document.cookie = 'firebase_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        checkKakaoUser();
+      }
+    });
     return () => unsubscribe();
   }, []);
+
+  // 카카오 사용자 확인
+  const checkKakaoUser = async () => {
+    try {
+      const response = await fetch('/api/auth/user');
+      const data = await response.json();
+      setKakaoUser(data.user);
+    } catch (error) {
+      console.error('카카오 사용자 확인 오류:', error);
+      setKakaoUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signInWithGoogle = async () => {
     try {
@@ -33,9 +63,38 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signInWithKakao = () => {
+    // 카카오 로그인 페이지로 이동
+    window.location.href = '/api/auth/kakao';
+  };
+
   const logout = async () => {
     try {
-      await signOut(auth);
+      // Firebase 로그아웃
+      if (firebaseUser) {
+        await signOut(auth);
+      }
+
+      // 카카오 로그아웃
+      if (kakaoUser) {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        setKakaoUser(null);
+      }
+
+      // 모든 관련 쿠키 삭제
+      const cookiesToDelete = [
+        'firebase_user',
+        'kakao_session',
+        'trial_data'
+      ];
+
+      cookiesToDelete.forEach(cookieName => {
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax`;
+      });
+
+      // 상태 초기화
+      setFirebaseUser(null);
+      setKakaoUser(null);
     } catch (error) {
       console.error("로그아웃 오류:", error);
       throw error;
@@ -43,9 +102,10 @@ export function AuthProvider({ children }) {
   };
 
   const value = {
-    user,
+    user: firebaseUser || kakaoUser,
     loading,
     signInWithGoogle,
+    signInWithKakao,
     logout,
   };
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function AuthPage() {
-  const { user, signInWithGoogle, logout } = useAuth();
+  const { user, signInWithGoogle, signInWithKakao, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -14,13 +14,18 @@ export default function AuthPage() {
     try {
       setIsLoading(true);
       await signInWithGoogle();
-      router.push("/"); // 로그인 성공 시 홈으로 이동
+      router.push("/");
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleKakaoSignIn = () => {
+    setIsLoading(true);
+    signInWithKakao();
   };
 
   const handleLogout = async () => {
@@ -43,22 +48,22 @@ export default function AuthPage() {
           <div className="space-y-6">
             <div className="text-center">
               <div className="w-20 h-20 rounded-full bg-muted mx-auto mb-4 overflow-hidden">
-                {user.photoURL ? (
+                {(user.photoURL || user.profile_image) ? (
                   <img
-                    src={user.photoURL}
+                    src={user.photoURL || user.profile_image}
                     alt="프로필 이미지"
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-muted-foreground">
-                    {user.displayName?.[0] || "U"}
+                    {(user.displayName || user.nickname)?.[0] || "U"}
                   </div>
                 )}
               </div>
               <h2 className="text-xl font-semibold text-card-foreground mb-2">
-                {user.displayName || "사용자"}
+                {user.displayName || user.nickname || "사용자"}
               </h2>
-              <p className="text-muted-foreground">{user.email}</p>
+              <p className="text-muted-foreground">카카오 계정</p>
             </div>
 
             <button
@@ -111,20 +116,27 @@ export default function AuthPage() {
               </button>
 
               <button
-                disabled={true}
-                className="w-full bg-[#FEE500] text-black py-4 px-6 rounded-xl font-semibold hover:bg-[#FFEB3B] transition-colors disabled:cursor-not-allowed flex items-center justify-center space-x-3 shadow-sm"
+                onClick={handleKakaoSignIn}
+                disabled={isLoading}
+                className="w-full bg-[#FEE500] text-black py-4 px-6 rounded-xl font-semibold hover:bg-[#FFEB3B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 shadow-sm"
                 style={{ backgroundColor: "#FEE500" }}
               >
-                <Image
-                  src="/image/kakao_symbol.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="w-5 h-5"
-                />
-                <span style={{ color: "rgba(0, 0, 0, 0.85)" }}>
-                  카카오 로그인
-                </span>
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Image
+                      src="/image/kakao_symbol.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="w-5 h-5"
+                    />
+                    <span style={{ color: "rgba(0, 0, 0, 0.85)" }}>
+                      카카오 로그인
+                    </span>
+                  </>
+                )}
               </button>
             </div>
 

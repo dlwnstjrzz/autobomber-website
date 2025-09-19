@@ -20,7 +20,10 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-background border-b border-border">
+    <header
+      className="bg-background border-b border-border"
+      onClick={() => (isUserMenuOpen ? setIsUserMenuOpen(false) : "")}
+    >
       <div className="container mx-auto px-6 py-4">
         <nav className="flex items-center justify-between h-16">
           {/* 로고 */}
@@ -44,7 +47,7 @@ export default function Header() {
           {/* 우측 메뉴 */}
           <div className="hidden md:flex items-center space-x-6">
             <Link
-              href="/notice"
+              href="/notices"
               className="text-foreground hover:text-primary transition-colors font-medium"
             >
               공지사항

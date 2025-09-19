@@ -9,18 +9,47 @@ export default function ProductSection() {
   const { user } = useAuth();
   const router = useRouter();
 
-  const handlePurchaseClick = (e) => {
-    e.preventDefault();
-
+  const handleTrialStart = async () => {
     if (!user) {
-      // 미로그인 시 로그인 페이지로 이동
       router.push("/auth");
       return;
     }
 
-    // 로그인된 상태면 구매 페이지로 이동
-    const planParam = selectedPlan === "trial" ? "trial" : "yearly";
-    router.push(`/purchase?plan=${planParam}`);
+    try {
+      // 체험 코드 생성 API 호출
+      const response = await fetch('/api/trial/create', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // 성공시 trial 데이터와 함께 purchase 페이지로 이동
+        router.push(`/purchase?plan=trial&code=${data.trial.code}`);
+      } else {
+        // 실패시 에러와 함께 purchase 페이지로 이동 (이미 사용한 계정 등)
+        router.push(`/purchase?plan=trial&error=${encodeURIComponent(data.error)}`);
+      }
+    } catch (error) {
+      console.error('체험 시작 오류:', error);
+      alert('체험 시작 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const handlePurchaseClick = (e) => {
+    e.preventDefault();
+
+    if (selectedPlan === "trial") {
+      handleTrialStart();
+      return;
+    }
+
+    if (!user) {
+      router.push("/auth");
+      return;
+    }
+
+    router.push(`/purchase?plan=yearly`);
   };
   return (
     <section className="py-16" style={{ backgroundColor: "#1a1a1a" }}>
