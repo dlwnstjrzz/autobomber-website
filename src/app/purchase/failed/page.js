@@ -1,8 +1,9 @@
 "use client";
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
-export default function PurchaseFailedPage() {
+function PurchaseFailedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
@@ -75,5 +76,20 @@ export default function PurchaseFailedPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PurchaseFailedPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-muted-foreground">로딩 중...</p>
+        </div>
+      </div>
+    }>
+      <PurchaseFailedContent />
+    </Suspense>
   );
 }
