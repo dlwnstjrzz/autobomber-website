@@ -1,11 +1,11 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import NicePayment from "@/components/NicePayment";
 import TrialComponent from "@/components/TrialComponent";
 
-export default function PurchasePage() {
+function PurchaseContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
@@ -50,7 +50,7 @@ export default function PurchasePage() {
   };
 
   const handlePayment = async () => {
-    if (!userInfo.name || !userInfo.phone || !userInfo.email) {
+    if (!userInfo.name || !userInfo.phone) {
       alert("모든 정보를 입력해주세요.");
       return;
     }
@@ -192,21 +192,6 @@ export default function PurchasePage() {
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      이메일 *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={userInfo.email}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                      placeholder="email@example.com"
-                      required
-                      disabled
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -240,5 +225,20 @@ export default function PurchasePage() {
         />
       )}
     </div>
+  );
+}
+
+export default function PurchasePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-muted-foreground">로딩 중...</p>
+        </div>
+      </div>
+    }>
+      <PurchaseContent />
+    </Suspense>
   );
 }

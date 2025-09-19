@@ -1,241 +1,226 @@
 "use client";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import RocketAnimation from '@/components/RocketAnimation';
+import { toast } from 'sonner';
 
-export default function PurchaseSuccessPage() {
+function PurchaseSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get('orderId');
   const amount = searchParams.get('amount');
   const plan = searchParams.get('plan');
 
-  const [flippedCards, setFlippedCards] = useState({
-    card1: false,
-    card2: false,
-    card3: false,
-    card4: false
-  });
-
-  const [showButtons, setShowButtons] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-
+  const [animationPhase, setAnimationPhase] = useState('initial'); // initial, shrink, details
+  const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
     console.log('결제 성공:', { orderId, amount, plan });
 
-    // 단계별 애니메이션 시퀀스
-    const timers = [
-      setTimeout(() => setCurrentStep(1), 800),
-      setTimeout(() => setCurrentStep(2), 1600),
-      setTimeout(() => setCurrentStep(3), 2400),
-      setTimeout(() => setCurrentStep(4), 3200),
-      setTimeout(() => setShowButtons(true), 4000),
-    ];
+    // 활성화 코드 조회
+    fetchActivationCode();
 
-    return () => timers.forEach(timer => clearTimeout(timer));
+    // 1초 후 체크 애니메이션 축소 및 위로 이동
+    const shrinkTimer = setTimeout(() => {
+      setAnimationPhase('shrink');
+    }, 1000);
+
+    // 애니메이션 완료 후 상세 정보 표시
+    const detailsTimer = setTimeout(() => {
+      setAnimationPhase('details');
+    }, 1500);
+
+    return () => {
+      clearTimeout(shrinkTimer);
+      clearTimeout(detailsTimer);
+    };
   }, [orderId, amount, plan]);
 
-  const handleCardHit = (cardNumber) => {
-    console.log('Card hit:', cardNumber);
-    setFlippedCards(prev => ({
-      ...prev,
-      [`card${cardNumber}`]: true
-    }));
+  const fetchActivationCode = async () => {
+    try {
+      if (plan === 'trial') {
+        // 무료 체험 코드 조회
+        const response = await fetch('/api/trial/status');
+        const data = await response.json();
+
+        if (data.hasTrial && data.trial.code) {
+          setActivationCode(data.trial.code);
+        }
+      } else if (plan === 'yearly') {
+        // 1년 이용권 코드 조회 (주문번호 기반)
+        if (orderId) {
+          const response = await fetch(`/api/license/${orderId}`);
+          const data = await response.json();
+
+          if (data.success && data.license.code) {
+            setActivationCode(data.license.code);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('활성화 코드 조회 오류:', error);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success("복사가 완료되었습니다!");
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
-      {/* 로켓 애니메이션 */}
-      <RocketAnimation onCardHit={handleCardHit} />
+    <div className="min-h-screen flex items-center justify-center p-4" style={{backgroundColor: "#FEFEFE"}}>
+      <div className="w-full max-w-md mx-auto">
+        {/* 상단 텍스트 */}
+        <div className="text-center mb-8">
+          <div className="mb-2">
+            <img
+              src="/image/logoText.svg"
+              alt="Logo"
+              className="h-6 mx-auto"
+            />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">결제 완료!</h2>
+        </div>
 
-      {/* 메인 컨텐츠 */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-sm w-full mx-auto">
-
-          {/* 제목 */}
-          <div className="text-center mb-6 animate-fade-in">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-              <svg className="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-primary mb-1">결제 완료!</h1>
-            <p className="text-muted-foreground text-sm">구매해주셔서 감사합니다</p>
+        {/* 메인 애니메이션 영역 */}
+        <div className="relative flex flex-col items-center">
+          {/* Success 비디오 - 초기에는 크게, 1초 후 작아지면서 위로 이동 */}
+          <div
+            className={`transition-all duration-700 ease-out ${
+              animationPhase === 'initial'
+                ? 'w-80 h-80 mb-8'
+                : 'w-32 h-32 mb-6 -translate-y-4'
+            }`}
+          >
+            <video
+              src="/video/Success.webm"
+              autoPlay
+              muted
+              playsInline
+              className="w-full h-full object-cover rounded-full"
+              style={{
+                clipPath: 'circle(50%)'
+              }}
+            >
+              성공 애니메이션
+            </video>
           </div>
 
-          {/* 정보 카드들 */}
-          <div className="space-y-3 mb-6">
+          {/* 상세 정보 카드 - 애니메이션 완료 후 페이드인 */}
+          <div
+            className={`w-full bg-white rounded-2xl shadow-lg p-6 transition-all duration-700 ${
+              animationPhase === 'details'
+                ? 'opacity-100 translate-y-0'
+                : 'opacity-0 translate-y-8'
+            }`}
+          >
+            {/* 결제 정보 */}
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">결제 상태</span>
+                <span className="text-green-600 font-semibold">완료</span>
+              </div>
 
-            {/* 결제 상태 */}
-            <div
-              className="bg-card border border-border rounded-lg p-4 transition-all duration-500"
-              style={{
-                opacity: currentStep >= 1 ? 1 : 0,
-                transform: currentStep >= 1 ? 'translateX(0)' : 'translateX(-20px)',
-                borderColor: currentStep >= 1 ? "rgba(254, 72, 71, 0.3)" : "rgba(229, 231, 235, 0.2)"
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className={currentStep >= 1 ? 'animate-pulse' : ''}>
-                    <div className="text-primary">
-                      {currentStep >= 1 ? (
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">결제 상태</div>
-                    <div className="text-xs text-muted-foreground">
-                      {currentStep >= 1 ? '성공적으로 처리됨' : '처리 중...'}
-                    </div>
-                  </div>
-                </div>
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                  currentStep >= 1
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-muted text-muted-foreground'
-                }`}>
-                  {currentStep >= 1 ? '완료' : '대기'}
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">플랜</span>
+                <span className="font-semibold text-gray-900">
+                  {plan === 'yearly' ? '1년 이용권' : '무료 체험'}
                 </span>
               </div>
+
+              {amount && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">결제 금액</span>
+                  <span className="font-bold text-gray-900 text-lg">
+                    ₩{Number(amount).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              {orderId && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">주문번호</span>
+                  <span className="font-mono text-sm text-gray-900">{orderId}</span>
+                </div>
+              )}
             </div>
 
-            {/* 결제 금액 */}
-            <div
-              className="bg-card border border-border rounded-lg p-4 transition-all duration-500"
-              style={{
-                opacity: currentStep >= 2 ? 1 : 0,
-                transform: currentStep >= 2 ? 'translateX(0)' : 'translateX(-20px)',
-                borderColor: currentStep >= 2 ? "rgba(254, 72, 71, 0.3)" : "rgba(229, 231, 235, 0.2)",
-                transitionDelay: '0.1s'
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className={currentStep >= 2 ? 'animate-pulse' : ''}>
-                    <div className="text-primary">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">결제 금액</div>
-                    <div className="text-xs text-muted-foreground">
-                      {plan === 'yearly' ? '1년 이용권' : '체험판'}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-bold text-primary">
-                    {currentStep >= 2 ? `₩${amount ? Number(amount).toLocaleString() : '0'}` : '---'}
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* 구분선 */}
+            <div className="border-t border-gray-200 my-6"></div>
 
-            {/* 주문번호 */}
-            <div
-              className="bg-card border border-border rounded-lg p-4 transition-all duration-500"
-              style={{
-                opacity: currentStep >= 3 ? 1 : 0,
-                transform: currentStep >= 3 ? 'translateX(0)' : 'translateX(-20px)',
-                borderColor: currentStep >= 3 ? "rgba(254, 72, 71, 0.3)" : "rgba(229, 231, 235, 0.2)",
-                transitionDelay: '0.2s'
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-primary">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">주문번호</div>
-                    <div className="text-xs text-muted-foreground font-mono break-all">
-                      {currentStep >= 3 ? (orderId || 'N/A') : '생성 중...'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 다음 단계 */}
-            <div
-              className="bg-card border border-border rounded-lg p-4 transition-all duration-500"
-              style={{
-                opacity: currentStep >= 4 ? 1 : 0,
-                transform: currentStep >= 4 ? 'translateX(0)' : 'translateX(-20px)',
-                borderColor: currentStep >= 4 ? "rgba(254, 72, 71, 0.3)" : "rgba(229, 231, 235, 0.2)",
-                transitionDelay: '0.3s'
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className={currentStep >= 4 ? 'animate-spin' : ''}>
-                    <div className="text-primary">
-                      {currentStep >= 4 ? (
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">다음 단계</div>
-                    <div className="text-xs text-muted-foreground">
-                      {currentStep >= 4 ? '이메일로 안내 발송' : '준비 중...'}
-                    </div>
-                  </div>
-                </div>
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                  currentStep >= 4
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-muted text-muted-foreground'
-                }`}>
-                  {currentStep >= 4 ? '준비됨' : '대기'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* 액션 버튼들 */}
-          <div className={`space-y-2 transition-all duration-600 ${showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
-            <div className="hover:scale-105 active:scale-95 transition-transform">
+            {/* 사용 가이드 */}
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-900 mb-3">📖 사용 가이드</h3>
               <Link
-                href="/"
-                className="block w-full py-3 px-4 bg-primary text-primary-foreground rounded-lg font-medium text-center hover:bg-primary/90 transition-colors text-sm"
+                href="/guide"
+                className="flex items-center justify-center w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium border border-gray-200"
               >
-                메인 페이지로 돌아가기
+                프로그램 사용법 및 설정 가이드 보기
               </Link>
             </div>
 
-            <div className="hover:scale-105 active:scale-95 transition-transform">
-              <button
-                onClick={() => router.back()}
-                className="block w-full py-3 px-4 border border-border rounded-lg font-medium hover:bg-secondary transition-colors text-sm"
-              >
-                이전 페이지로
-              </button>
+            {/* 프로그램 다운로드 */}
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-900 mb-3">💻 프로그램 다운로드</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => window.open('/download/windows', '_blank')}
+                  className="flex items-center justify-center px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                >
+                  <img
+                    src="/image/windowLogo.png"
+                    alt="Windows"
+                    className="w-5 h-5 mr-2"
+                  />
+                  Windows
+                </button>
+                <button
+                  onClick={() => window.open('/download/mac', '_blank')}
+                  className="flex items-center justify-center px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors text-sm font-medium"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                  </svg>
+                  macOS
+                </button>
+              </div>
             </div>
+
+            {/* 활성화 코드 */}
+            {activationCode && (
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-900 mb-3">🔑 프로그램 활성화 코드</h3>
+                <div
+                  className="bg-gray-50 rounded-lg p-3 text-center border-2 border-dashed border-blue-300 cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-colors"
+                  onClick={() => copyToClipboard(activationCode)}
+                >
+                  <div className="text-xl font-bold font-mono text-gray-900 mb-1">
+                    {activationCode}
+                  </div>
+                  <div className="text-xs text-blue-600 font-medium">
+                    클릭하여 복사
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PurchaseSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{backgroundColor: "#FEFEFE"}}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    }>
+      <PurchaseSuccessContent />
+    </Suspense>
   );
 }
