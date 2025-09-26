@@ -1,23 +1,18 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function PaymentFailPage() {
-  const [errorInfo, setErrorInfo] = useState(null);
+function PaymentFailContent() {
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const code = searchParams.get('code');
-    const message = searchParams.get('message');
-    const orderId = searchParams.get('orderId');
-
-    setErrorInfo({
-      code,
-      message,
-      orderId,
-    });
-  }, [searchParams]);
+  const errorInfo = {
+    code: searchParams.get("code"),
+    message: searchParams.get("message"),
+    orderId: searchParams.get("orderId"),
+  };
+  const hasErrorInfo = Boolean(
+    errorInfo.code || errorInfo.message || errorInfo.orderId
+  );
 
   return (
     <div className="min-h-screen bg-gray-900" style={{ backgroundColor: "#1a1a1a" }}>
@@ -35,9 +30,8 @@ export default function PaymentFailPage() {
           {/* 실패 메시지 */}
           <h1 className="text-3xl font-bold text-white mb-4">결제에 실패했습니다</h1>
           <p className="text-gray-400 mb-8">결제 처리 중 문제가 발생했습니다.</p>
-
           {/* 오류 정보 */}
-          {errorInfo && (
+          {hasErrorInfo && (
             <div className="bg-gray-800 rounded-lg p-6 mb-8">
               <h2 className="text-lg font-semibold text-white mb-4">오류 정보</h2>
               <div className="space-y-3 text-left">
@@ -86,5 +80,19 @@ export default function PaymentFailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentFailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-900" style={{ backgroundColor: "#1a1a1a" }}>
+          <p className="text-gray-300">결제 정보를 불러오는 중입니다...</p>
+        </div>
+      }
+    >
+      <PaymentFailContent />
+    </Suspense>
   );
 }

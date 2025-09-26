@@ -1,21 +1,15 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function PaymentSuccessPage() {
-  const [paymentInfo, setPaymentInfo] = useState(null);
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const orderId = searchParams.get('orderId');
-    const amount = searchParams.get('amount');
-
-    setPaymentInfo({
-      orderId,
-      amount: amount ? parseInt(amount) : 0,
-    });
-  }, [searchParams]);
+  const orderId = searchParams.get("orderId");
+  const amountParam = searchParams.get("amount");
+  const parsedAmount = amountParam ? Number(amountParam) : null;
+  const hasValidAmount = typeof parsedAmount === "number" && !Number.isNaN(parsedAmount);
+  const hasPaymentInfo = Boolean(orderId || hasValidAmount);
 
   return (
     <div className="min-h-screen bg-gray-900" style={{ backgroundColor: "#1a1a1a" }}>
@@ -33,20 +27,23 @@ export default function PaymentSuccessPage() {
           {/* 성공 메시지 */}
           <h1 className="text-3xl font-bold text-white mb-4">결제가 완료되었습니다!</h1>
           <p className="text-gray-400 mb-8">안전하게 결제가 처리되었습니다.</p>
-
           {/* 결제 정보 */}
-          {paymentInfo && (
+          {hasPaymentInfo && (
             <div className="bg-gray-800 rounded-lg p-6 mb-8">
               <h2 className="text-lg font-semibold text-white mb-4">결제 정보</h2>
               <div className="space-y-3 text-left">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">주문번호</span>
-                  <span className="text-white font-mono text-sm">{paymentInfo.orderId}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">결제금액</span>
-                  <span className="text-white font-semibold">{paymentInfo.amount.toLocaleString()}원</span>
-                </div>
+                {orderId && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">주문번호</span>
+                    <span className="text-white font-mono text-sm">{orderId}</span>
+                  </div>
+                )}
+                {hasValidAmount && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">결제금액</span>
+                    <span className="text-white font-semibold">{parsedAmount.toLocaleString()}원</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-400">상품명</span>
                   <span className="text-white">오토봄버 제품</span>
@@ -78,5 +75,19 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-900" style={{ backgroundColor: "#1a1a1a" }}>
+          <p className="text-gray-300">결제 정보를 불러오는 중입니다...</p>
+        </div>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

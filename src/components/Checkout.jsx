@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useSearchParams } from "next/navigation";
 
 const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 
-export function CheckoutPage() {
+function CheckoutContent() {
   const [ready, setReady] = useState(false);
   const [widgets, setWidgets] = useState(null);
   const [productInfo, setProductInfo] = useState(null);
@@ -145,5 +145,19 @@ export function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="wrapper w-100 flex items-center justify-center">
+          <p className="text-gray-600">결제 정보를 불러오는 중입니다...</p>
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }
