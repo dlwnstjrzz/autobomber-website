@@ -18,12 +18,12 @@ export default function MarginCalculator() {
         "원가, 배송비, 카드 수수료 등 모든 비용 입력 가능",
         "판매가 변경 시 마진 변화 실시간 확인",
         "CSV, 엑셀 파일로 결과 저장 가능 (옵션)",
-        "사용법이 간단하여 초보자도 바로 활용 가능"
-      ]
+        "사용법이 간단하여 초보자도 바로 활용 가능",
+      ],
     };
 
     const queryParams = new URLSearchParams({
-      product: JSON.stringify(productInfo)
+      product: JSON.stringify(productInfo),
     });
 
     router.push(`/buy?${queryParams.toString()}`);
@@ -39,7 +39,7 @@ export default function MarginCalculator() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-3xl font-bold text-card-foreground mb-3">
-                    마진 계산기
+                    마진 계산기 &lt;3개월 사용권&gt;
                   </h2>
                   <p className="text-lg text-muted-foreground mb-4">
                     정확한 수익률 계산을 위한 필수 도구
@@ -51,7 +51,7 @@ export default function MarginCalculator() {
                   <div className="border-2 border-primary rounded-lg p-6 bg-primary/5">
                     <div className="text-center">
                       <div className="text-lg font-bold text-card-foreground mb-2">
-                        구매
+                        3개월 이용권 구매
                       </div>
                       <div className="text-3xl font-bold text-primary">
                         ₩19,900
@@ -119,6 +119,21 @@ export default function MarginCalculator() {
 
         {/* 상세 페이지 내용들 */}
         <div className="max-w-4xl mx-auto mt-16 space-y-12">
+          <div className="bg-card rounded-lg p-8">
+            <h3 className="text-2xl font-bold text-card-foreground mb-4 flex items-center gap-2">
+              📦 프로그램 제공 방법
+            </h3>
+            <div className="space-y-3 text-muted-foreground">
+              <p>
+                해당 서비스는 엑셀 파일로 제공되며, 구매 시 주문조회에서 디지털
+                파일을 다운받으실 수 있습니다.
+              </p>
+              <p>
+                해당 서비스는 3개월 제공되며, 구매 시 3개월동안 사용하실 수 있는
+                엑셀 비밀번호 코드가 제공됩니다.
+              </p>
+            </div>
+          </div>
           {/* 사용 방법 */}
           <div className="bg-card rounded-lg p-8">
             <h3 className="text-2xl font-bold text-card-foreground mb-6 flex items-center gap-2">
