@@ -20,9 +20,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <head>
-        <script src="https://js.tosspayments.com/v2/standard"></script>
-      </head>
       <body
         className={`${pretendard.variable} antialiased font-pretendard`}
         suppressHydrationWarning={true}
