@@ -9,7 +9,24 @@ export default function MarginCalculator() {
   const router = useRouter();
 
   const handlePurchaseClick = () => {
-    router.push("/buy");
+    const productInfo = {
+      name: "마진 계산기",
+      price: 19900,
+      description: "정확한 수익률 계산을 위한 필수 도구",
+      features: [
+        "스마트스토어/쿠팡 각종 수수료 자동 적용",
+        "원가, 배송비, 카드 수수료 등 모든 비용 입력 가능",
+        "판매가 변경 시 마진 변화 실시간 확인",
+        "CSV, 엑셀 파일로 결과 저장 가능 (옵션)",
+        "사용법이 간단하여 초보자도 바로 활용 가능"
+      ]
+    };
+
+    const queryParams = new URLSearchParams({
+      product: JSON.stringify(productInfo)
+    });
+
+    router.push(`/buy?${queryParams.toString()}`);
   };
 
   return (
