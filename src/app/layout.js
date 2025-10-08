@@ -20,14 +20,21 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body className={`${pretendard.variable} antialiased font-pretendard`} suppressHydrationWarning={true}>
+      <head>
+        <script
+          src="https://proofly.vercel.app/widgets/modern/urgency.js"
+          data-widget-api-url="https://proofly.vercel.app/api/get-settings"
+        ></script>
+      </head>
+      <body
+        className={`${pretendard.variable} antialiased font-pretendard`}
+        suppressHydrationWarning={true}
+      >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>
             <div className="min-h-screen bg-background text-foreground flex flex-col">
               <Header />
-              <main className="flex-1">
-                {children}
-              </main>
+              <main className="flex-1">{children}</main>
               <Footer />
             </div>
             <Toaster />
