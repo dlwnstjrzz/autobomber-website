@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @theme inline {
   --color-background: var(--background);
@@ -75,7 +74,6 @@
   --sidebar-border: oklch(0.4 0 0);
   --sidebar-ring: oklch(0.63 0.27 30); /* #fe4847 */
 }
-
 
 @layer base {
   * {
@@ -187,24 +185,6 @@
     stroke-dasharray: 100 100;
     stroke-dashoffset: 0;
   }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.6s ease-out;
-}
-
-.animate-rocket-fly {
-  animation: rocket-fly 3s ease-in-out;
-  position: fixed;
-  left: 0;
-  top: 0;
-}
-
-.animate-rocket-trail {
-  animation: rocket-trail 3s ease-in-out 0.1s;
-  position: fixed;
-  left: 0;
-  top: 0;
 }
 
 .animate-success-bg {
