@@ -2,15 +2,12 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import NicePayment from "@/components/NicePayment";
 import TrialComponent from "@/components/TrialComponent";
 
 function PurchaseContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
-  const [paymentData, setPaymentData] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: "",
     phone: "",
@@ -49,7 +46,7 @@ function PurchaseContent() {
     setUserInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePayment = async () => {
+  const handlePayment = () => {
     if (!userInfo.name || !userInfo.phone) {
       alert("모든 정보를 입력해주세요.");
       return;
@@ -63,53 +60,23 @@ function PurchaseContent() {
       return;
     }
 
-    setIsProcessing(true);
+    const productInfo = {
+      name: `블로그 서이추 자동화 - ${currentPlan.name}`,
+      price: currentPlan.price,
+      description: currentPlan.description,
+      plan,
+      buyer: {
+        name: userInfo.name,
+        phone: userInfo.phone,
+        email: userInfo.email,
+      },
+    };
 
-    try {
-      console.log("결제 준비 요청 시작...");
+    const queryParams = new URLSearchParams({
+      product: JSON.stringify(productInfo),
+    });
 
-      const response = await fetch("/api/payment/prepare", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: currentPlan.price,
-          goodsName: `블로그 서이추 자동화 - ${currentPlan.name}`,
-          buyerName: userInfo.name,
-          buyerTel: userInfo.phone,
-          buyerEmail: userInfo.email,
-        }),
-      });
-
-      const result = await response.json();
-      console.log("결제 준비 응답:", result);
-
-      if (result.success) {
-        console.log("결제 데이터 설정:", result.paymentData);
-        setPaymentData(result.paymentData);
-      } else {
-        throw new Error(result.error || "결제 준비 실패");
-      }
-    } catch (error) {
-      console.error("결제 준비 실패:", error);
-      alert(`결제 준비 중 오류가 발생했습니다: ${error.message}`);
-      setIsProcessing(false);
-    }
-  };
-
-  const handlePaymentSuccess = () => {
-    console.log("결제 성공 처리");
-    setIsProcessing(false);
-    setPaymentData(null);
-    router.push("/purchase/success");
-  };
-
-  const handlePaymentFailure = (error) => {
-    console.log("결제 실패 처리:", error);
-    setIsProcessing(false);
-    setPaymentData(null);
-    alert(`결제 실패: ${error}`);
+    router.push(`/buy?${queryParams.toString()}`);
   };
 
   if (!user) {
@@ -199,31 +166,17 @@ function PurchaseContent() {
               <div className="text-center">
                 <button
                   onClick={handlePayment}
-                  disabled={isProcessing}
                   className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-colors ${
-                    isProcessing
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-primary hover:bg-primary/90"
+                    "bg-primary hover:bg-primary/90"
                   } text-white`}
                 >
-                  {isProcessing
-                    ? "결제 처리 중..."
-                    : `₩${currentPlan.price.toLocaleString()} 결제하기`}
+                  {`₩${currentPlan.price.toLocaleString()} 결제하기`}
                 </button>
               </div>
             </>
           )}
         </div>
       </div>
-
-      {/* 나이스페이 결제 컴포넌트 */}
-      {paymentData && (
-        <NicePayment
-          paymentData={paymentData}
-          onSuccess={handlePaymentSuccess}
-          onFailure={handlePaymentFailure}
-        />
-      )}
     </div>
   );
 }
@@ -231,10 +184,14 @@ function PurchaseContent() {
 export default function PurchasePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">로딩 중...</p>
+          <p className="text-white text-lg font-medium mb-4">결제 페이지를 준비하고 있어요</p>
+          <img
+            src="/image/loadingSpinner.gif"
+            alt="Loading..."
+            className="w-40 h-40 mx-auto"
+          />
         </div>
       </div>
     }>

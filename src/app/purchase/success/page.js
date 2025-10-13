@@ -118,7 +118,7 @@ function PurchaseSuccessContent() {
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">결제 상태</span>
-                <span className="text-green-600 font-semibold">완료</span>
+                <span className="font-semibold" style={{color: "#F43099"}}>완료</span>
               </div>
 
               <div className="flex justify-between items-center">
@@ -153,7 +153,8 @@ function PurchaseSuccessContent() {
               <h3 className="font-semibold text-gray-900 mb-3">📖 사용 가이드</h3>
               <Link
                 href="/guide"
-                className="flex items-center justify-center w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium border border-gray-200"
+                className="flex items-center justify-center w-full py-3 px-4 text-white rounded-lg hover:opacity-90 transition-all text-sm font-medium"
+                style={{backgroundColor: "#615EFF"}}
               >
                 프로그램 사용법 및 설정 가이드 보기
               </Link>
@@ -191,13 +192,14 @@ function PurchaseSuccessContent() {
               <div className="mb-6">
                 <h3 className="font-semibold text-gray-900 mb-3">🔑 프로그램 활성화 코드</h3>
                 <div
-                  className="bg-gray-50 rounded-lg p-3 text-center border-2 border-dashed border-blue-300 cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-colors"
+                  className="bg-gray-50 rounded-lg p-3 text-center border-2 border-dashed cursor-pointer hover:bg-opacity-10 transition-colors"
+                  style={{borderColor: "#615EFF", hover: {backgroundColor: "#615EFF"}}}
                   onClick={() => copyToClipboard(activationCode)}
                 >
                   <div className="text-xl font-bold font-mono text-gray-900 mb-1">
                     {activationCode}
                   </div>
-                  <div className="text-xs text-blue-600 font-medium">
+                  <div className="text-xs font-medium" style={{color: "#615EFF"}}>
                     클릭하여 복사
                   </div>
                 </div>
@@ -213,10 +215,14 @@ function PurchaseSuccessContent() {
 export default function PurchaseSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{backgroundColor: "#FEFEFE"}}>
+      <div className="min-h-screen flex flex-col items-center justify-center" style={{backgroundColor: "#FEFEFE"}}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">로딩 중...</p>
+          <p className="text-white text-lg font-medium mb-4">결제 정보를 불러오고 있어요</p>
+          <img
+            src="/image/loadingSpinner.gif"
+            alt="Loading..."
+            className="w-40 h-40 mx-auto"
+          />
         </div>
       </div>
     }>

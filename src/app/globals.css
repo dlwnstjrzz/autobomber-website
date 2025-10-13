@@ -77,65 +77,104 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    /* @apply border-border outline-ring/50; */
     font-family: var(--font-pretendard) !important;
   }
   body {
-    @apply bg-background text-foreground;
+    /* @apply bg-background text-foreground; */
     font-family: var(--font-pretendard) !important;
   }
+}
+
+/* 토스페이먼츠 결제 위젯 스타일 */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  overflow: auto;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.max-w-540 {
+  max-width: 540px;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.btn-wrapper {
+  padding: 0 24px;
+}
+
+.btn {
+  padding: 11px 22px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f2f4f6;
+  color: #4e5968;
+  font-weight: 600;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background-color: #3282f6; /* 우리 웹사이트 primary 색상 */
+  color: #f9fcff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.title {
+  margin-top: 32px;
+  margin-bottom: 0;
+  color: #191f28;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.description {
+  margin-top: 8px;
+  color: #4e5968;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.color-grey {
+  color: #b0b8c1;
 }
 
 .font-pretendard {
   font-family: var(--font-pretendard) !important;
-}
-
-/* 커스텀 애니메이션 */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes rocket-fly {
-  0% {
-    transform: translate(-200px, 100px) rotate(45deg) scale(0.3);
-  }
-  25% {
-    transform: translate(50px, 200px) rotate(0deg) scale(0.5);
-  }
-  50% {
-    transform: translate(300px, 150px) rotate(-15deg) scale(0.4);
-  }
-  75% {
-    transform: translate(500px, 300px) rotate(30deg) scale(0.6);
-  }
-  100% {
-    transform: translate(800px, 50px) rotate(45deg) scale(0.2);
-  }
-}
-
-@keyframes rocket-trail {
-  0% {
-    transform: translate(-250px, 120px);
-  }
-  25% {
-    transform: translate(0px, 220px);
-  }
-  50% {
-    transform: translate(250px, 170px);
-  }
-  75% {
-    transform: translate(450px, 320px);
-  }
-  100% {
-    transform: translate(750px, 70px);
-  }
 }
 
 @keyframes success-bg {

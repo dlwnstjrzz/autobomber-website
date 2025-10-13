@@ -1,8 +1,18 @@
 "use client";
 
 export default function NoticesPage() {
+  const today = new Date().toLocaleDateString("ko-KR").replace(/\. /g, ".").replace(/\.$/, "");
+
   // 공지사항 더미 데이터 (실제로는 API나 CMS에서 가져올 예정)
   const notices = [
+    {
+      id: "guide",
+      title: "프로그램 사용 가이드 (네이버 블로그)",
+      date: today,
+      isNew: true,
+      category: "가이드",
+      url: "https://blog.naver.com/autobomber/223996758113"
+    },
     {
       id: 1,
       title: "자동화 폭격기 v2.0 업데이트 안내",
@@ -59,7 +69,8 @@ export default function NoticesPage() {
       '점검': 'bg-red-100 text-red-700',
       '기능': 'bg-green-100 text-green-700',
       '이벤트': 'bg-purple-100 text-purple-700',
-      '안내': 'bg-gray-100 text-gray-700'
+      '안내': 'bg-gray-100 text-gray-700',
+      '가이드': 'bg-amber-100 text-amber-700'
     };
     return colors[category] || 'bg-gray-100 text-gray-700';
   };

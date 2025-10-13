@@ -2,7 +2,9 @@ export default function TermsPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-4xl mx-auto bg-card rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-8 text-card-foreground">서비스 이용약관</h1>
+        <h1 className="text-3xl font-bold text-center mb-8 text-card-foreground">
+          서비스 이용약관
+        </h1>
 
         <div className="space-y-8 text-card-foreground">
           <section>
@@ -78,9 +80,7 @@ export default function TermsPage() {
               </div>
 
               <div>
-                <h3 className="font-bold mb-2">
-                  제3조 (회사정보 등의 제공)
-                </h3>
+                <h3 className="font-bold mb-2">제3조 (회사정보 등의 제공)</h3>
                 <p className="mb-4">
                   회사는 다음 각 호의 사항을 회원이 알아보기 쉽도록 서비스 내에
                   표시합니다. 다만, 개인정보처리방침과 약관은 회원이 연결화면을
@@ -101,9 +101,7 @@ export default function TermsPage() {
               </div>
 
               <div>
-                <h3 className="font-bold mb-2">
-                  제4조 (약관의 효력 및 변경)
-                </h3>
+                <h3 className="font-bold mb-2">제4조 (약관의 효력 및 변경)</h3>
                 <div className="ml-4 space-y-2">
                   <p>
                     ① 회사는 이 약관의 내용을 회원이 알 수 있도록 서비스 내 또는
@@ -885,6 +883,12 @@ export default function TermsPage() {
                   <p>
                     ⑨ 카드 결제를 통한 구매 건의 환불은 원칙적으로 카드 매출
                     취소 환불을 통해서만 가능합니다.
+                  </p>
+                  <p>
+                    ⑩ 교환 및 반품 안내 환불 및 교환은 서비스 구매일로부터 7일
+                    이내에 요청하셔야 합니다. 구매일로부터 7일 이내에 요청하시면
+                    전액 환불이 가능합니다. 7일 이후에는 환불이 어려운 점 양해
+                    부탁드립니다.
                   </p>
                 </div>
               </div>

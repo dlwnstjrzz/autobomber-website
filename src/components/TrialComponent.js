@@ -83,13 +83,14 @@ export default function TrialComponent({ trialCode, trialError, onTrialSuccess }
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="text-center py-12">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-8 h-8 border-2 border-gray-300 border-t-green-600 rounded-full animate-spin"></div>
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">체험 코드 생성 중...</h2>
-          <p className="text-gray-500 text-sm">잠시만 기다려주세요</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <div className="text-center">
+          <p className="text-white text-lg font-medium mb-4">체험 코드 생성 중...</p>
+          <img
+            src="/image/loadingSpinner.gif"
+            alt="Loading..."
+            className="w-40 h-40 mx-auto"
+          />
         </div>
       </div>
     );
