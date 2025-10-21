@@ -1,15 +1,20 @@
+import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useSearchParams } from "next/navigation";
 
 const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
-const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+const clientKey = "test_gck_Z1aOwX7K8mYJ1e7BWbRP8yQxzvNP";
 const fallbackProduct = {
   name: "블로그 서이추 자동화 프로그램",
   price: 239000,
   description: "블로그 서이추 자동화",
   plan: "yearly",
+  referral: null,
 };
+
+const formatCurrency = (value) =>
+  `₩${Number(value || 0).toLocaleString("ko-KR")}`;
 
 function CheckoutContent() {
   const [ready, setReady] = useState(false);
@@ -20,6 +25,7 @@ function CheckoutContent() {
     value: fallbackProduct.price,
   });
   const searchParams = useSearchParams();
+  const referralInfo = productInfo?.referral;
 
   // URL 파라미터에서 제품 정보 가져오기
   useEffect(() => {
@@ -113,43 +119,115 @@ function CheckoutContent() {
   }, [widgets, amount]); // amount 추가로 금액 변경 시에도 재렌더링
 
   return (
-    <div className="wrapper w-100">
-      <div className="max-w-540 w-100 bg-white">
-        {/* 상품 정보 표시 */}
+    <div className="flex items-center justify-center bg-[#161616] px-4 py-10">
+      <div className="flex w-[700px] h-[650px] overflow-hidden rounded-3xl bg-white">
+        <section className="flex flex-1 flex-col h-full bg-white p-8">
+          <div className="flex h-full flex-col oveflow-scroll">
+            <div className="flex-1">
+              <div id="payment-method" className="payment-widget" />
+            </div>
+            <div className="mt-6">
+              <div id="agreement" className="agreement-widget" />
+            </div>
+            <button
+              className="mt-8 w-full cursor-pointer rounded-lg bg-[#0064FF] py-3.5 text-[16px] font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={!ready}
+              onClick={async () => {
+                try {
+                  /**
+                   * 결제 요청
+                   * 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
+                   * 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
+                   * @docs https://docs.tosspayments.com/sdk/v2/js#widgetsrequestpayment
+                   */
+                  const plan =
+                    productInfo?.plan || fallbackProduct.plan || "yearly";
+                  const referralCode =
+                    productInfo?.referral?.code ||
+                    productInfo?.referral?.referralCode ||
+                    null;
+                  const successUrl = new URL(
+                    "/api/payments/success",
+                    window.location.origin
+                  );
+                  successUrl.searchParams.set("plan", plan);
+                  if (referralCode) {
+                    successUrl.searchParams.set("referralCode", referralCode);
+                  }
+                  await widgets?.requestPayment({
+                    orderId: generateRandomString(),
+                    orderName: productInfo?.name || fallbackProduct.name,
+                    customerName: productInfo?.buyer?.name || "구매자",
+                    customerEmail:
+                      productInfo?.buyer?.email || "customer@example.com",
+                    customerMobilePhone: productInfo?.buyer?.phone,
+                    successUrl: successUrl.toString(),
+                    failUrl: `${
+                      window.location.origin
+                    }/api/payments/fail?plan=${encodeURIComponent(plan)}`,
+                  });
+                } catch (error) {
+                  console.error("결제 요청 실패:", error);
+                }
+              }}
+            >
+              {ready ? "결제하기" : "결제 준비 중..."}
+            </button>
+          </div>
+        </section>
 
-        <div id="payment-method" className="w-100" />
-        <div id="agreement" className="w-100" />
-        <div className="btn-wrapper w-100">
-          <button
-            className="btn primary w-100"
-            disabled={!ready}
-            onClick={async () => {
-              try {
-                /**
-                 * 결제 요청
-                 * 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
-                 * 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
-                 * @docs https://docs.tosspayments.com/sdk/v2/js#widgetsrequestpayment
-                 */
-                const plan = productInfo?.plan || fallbackProduct.plan || "yearly";
-                await widgets?.requestPayment({
-                  orderId: generateRandomString(),
-                  orderName: productInfo?.name || fallbackProduct.name,
-                  customerName: productInfo?.buyer?.name || "구매자",
-                  customerEmail:
-                    productInfo?.buyer?.email || "customer@example.com",
-                  customerMobilePhone: productInfo?.buyer?.phone,
-                  successUrl: `${window.location.origin}/api/payments/success?plan=${encodeURIComponent(plan)}`,
-                  failUrl: `${window.location.origin}/api/payments/fail?plan=${encodeURIComponent(plan)}`,
-                });
-              } catch (error) {
-                console.error("결제 요청 실패:", error);
-              }
-            }}
-          >
-            {ready ? "결제하기" : "결제 준비 중..."}
-          </button>
-        </div>
+        <aside className="flex flex-col w-[210px] justify-between bg-[#F2F4F6] p-6 pt-8">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-[#8B95A1]">상품명</span>
+              <p className="text-[14px] font-normal leading-relaxed text-[#4E5968]">
+                {productInfo?.name == "블로그 서이추 자동화 - 1년 이용권"
+                  ? "블로그 서이추 자동화(1년)"
+                  : productInfo.name}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <span className="text-sm font-medium text-[#8B95A1]">
+                결제 금액
+              </span>
+              {referralInfo?.discountAmount ? (
+                <div className="flex flex-col gap-1">
+                  <span className="text-[26px] font-bold text-[#191F28]">
+                    {formatCurrency(
+                      productInfo?.price || fallbackProduct.price
+                    )}
+                  </span>
+                  <span className="text-xs font-semibold text-[#0064FF]">
+                    추천인 할인 -{formatCurrency(referralInfo.discountAmount)}{" "}
+                    (5%)
+                  </span>
+                </div>
+              ) : (
+                <span className="text-[26px] font-bold text-[#191F28]">
+                  {formatCurrency(productInfo?.price || fallbackProduct.price)}
+                </span>
+              )}
+            </div>
+
+            {!referralInfo?.discountAmount &&
+              (referralInfo?.code || referralInfo?.referralCode) && (
+                <span className="text-xs text-[#4B5563]">
+                  추천인 코드: {referralInfo.code || referralInfo.referralCode}
+                </span>
+              )}
+          </div>
+
+          <div>
+            <Image
+              src="/image/logoText.png"
+              alt="Autobomber"
+              width={160}
+              height={40}
+              priority
+            />
+          </div>
+        </aside>
       </div>
     </div>
   );
