@@ -122,12 +122,14 @@ function CheckoutContent() {
     <div className="flex items-center justify-center bg-[#161616] px-4 py-10">
       <div className="flex w-[700px] h-[650px] overflow-hidden rounded-3xl bg-white">
         <section className="flex flex-1 flex-col h-full bg-white p-8">
-          <div className="flex h-full flex-col oveflow-scroll">
-            <div className="flex-1">
-              <div id="payment-method" className="payment-widget" />
-            </div>
-            <div className="mt-6">
-              <div id="agreement" className="agreement-widget" />
+          <div className="flex h-full flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto pr-2">
+              <div>
+                <div id="payment-method" className="payment-widget" />
+              </div>
+              <div className="mt-6">
+                <div id="agreement" className="agreement-widget" />
+              </div>
             </div>
             <button
               className="mt-8 w-full cursor-pointer rounded-lg bg-[#0064FF] py-3.5 text-[16px] font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
@@ -176,7 +178,7 @@ function CheckoutContent() {
           </div>
         </section>
 
-        <aside className="flex flex-col w-[210px] justify-between bg-[#F2F4F6] p-6 pt-8">
+        <aside className="flex flex-col w-[210px] justify-between bg-[#F2F4F6] p-6 py-8">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-[#8B95A1]">상품명</span>
