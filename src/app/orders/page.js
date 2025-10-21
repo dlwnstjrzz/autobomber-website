@@ -17,7 +17,11 @@ export default function OrdersPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push("/auth");
+      const redirectPath =
+        typeof window !== "undefined"
+          ? `${window.location.pathname}${window.location.search}`
+          : "/orders";
+      router.push(`/auth?redirect=${encodeURIComponent(redirectPath)}`);
       return;
     }
 

@@ -63,9 +63,15 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signInWithKakao = () => {
-    // 카카오 로그인 페이지로 이동
-    window.location.href = '/api/auth/kakao';
+  const signInWithKakao = (redirectTo) => {
+    // 카카오 로그인 페이지로 이동 (이전 페이지 정보 전달)
+    let kakaoUrl = '/api/auth/kakao';
+
+    if (redirectTo && typeof redirectTo === 'string' && redirectTo.startsWith('/')) {
+      kakaoUrl += `?redirect=${encodeURIComponent(redirectTo)}`;
+    }
+
+    window.location.href = kakaoUrl;
   };
 
   const logout = async () => {

@@ -11,7 +11,8 @@ export default function ProductSection() {
 
   const handleTrialStart = async () => {
     if (!user) {
-      router.push("/auth");
+      const redirectPath = `${window.location.pathname}${window.location.search}`;
+      router.push(`/auth?redirect=${encodeURIComponent(redirectPath)}`);
       return;
     }
 
@@ -45,7 +46,8 @@ export default function ProductSection() {
     }
 
     if (!user) {
-      router.push("/auth");
+      const redirectPath = `${window.location.pathname}${window.location.search}`;
+      router.push(`/auth?redirect=${encodeURIComponent(redirectPath)}`);
       return;
     }
 

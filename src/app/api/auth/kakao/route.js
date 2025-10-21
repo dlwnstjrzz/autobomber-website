@@ -3,6 +3,39 @@ import { NextResponse } from 'next/server';
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
+  const redirectParam = searchParams.get('redirect');
+  const stateParam = searchParams.get('state');
+
+  const sanitizeRedirect = (value) => {
+    if (!value || typeof value !== 'string') {
+      return null;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed.startsWith('/')) {
+      return null;
+    }
+
+    return trimmed;
+  };
+
+  const getRedirectDestination = () => {
+    let decodedState = null;
+
+    if (stateParam) {
+      try {
+        decodedState = decodeURIComponent(stateParam);
+      } catch (error) {
+        decodedState = stateParam;
+      }
+    }
+
+    return (
+      sanitizeRedirect(decodedState) ||
+      sanitizeRedirect(redirectParam) ||
+      '/'
+    );
+  };
 
   // 1단계: 인가 코드가 없으면 카카오 로그인 페이지로 리다이렉트
   if (!code) {
@@ -14,6 +47,11 @@ export async function GET(request) {
     authURL.searchParams.set('redirect_uri', REDIRECT_URI);
     authURL.searchParams.set('response_type', 'code');
     authURL.searchParams.set('scope', 'profile_nickname,profile_image');
+    const redirectTarget = sanitizeRedirect(redirectParam);
+
+    if (redirectTarget) {
+      authURL.searchParams.set('state', encodeURIComponent(redirectTarget));
+    }
 
     console.log('카카오 인증 URL:', authURL.toString());
 
@@ -68,7 +106,11 @@ export async function GET(request) {
     console.log('사용자 데이터 전체:', JSON.stringify(userData, null, 2));
 
     // 4단계: 사용자 정보를 세션에 저장하고 리다이렉트
-    const response = NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/auth`);
+    const redirectDestination = getRedirectDestination();
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || '').replace(/\/+$/, '');
+    const response = NextResponse.redirect(
+      `${siteUrl}${redirectDestination}`
+    );
 
     // 세션 쿠키에 사용자 정보 저장
     const userInfo = {

@@ -1,20 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 export default function AuthPage() {
   const { user, signInWithGoogle, signInWithKakao, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
+  const redirectTarget =
+    redirectParam && redirectParam.startsWith("/") ? redirectParam : null;
+
+  useEffect(() => {
+    if (user && redirectTarget) {
+      router.replace(redirectTarget);
+    }
+  }, [user, redirectTarget, router]);
 
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
       await signInWithGoogle();
-      router.push("/");
+      router.push(redirectTarget || "/");
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인에 실패했습니다. 다시 시도해주세요.");
@@ -25,7 +35,7 @@ export default function AuthPage() {
 
   const handleKakaoSignIn = () => {
     setIsLoading(true);
-    signInWithKakao();
+    signInWithKakao(redirectTarget || "/");
   };
 
   const handleLogout = async () => {

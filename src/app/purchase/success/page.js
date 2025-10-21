@@ -10,12 +10,13 @@ function PurchaseSuccessContent() {
   const orderId = searchParams.get('orderId');
   const amount = searchParams.get('amount');
   const plan = searchParams.get('plan');
+  const referralCode = searchParams.get('referralCode');
 
   const [animationPhase, setAnimationPhase] = useState('initial'); // initial, shrink, details
   const [activationCode, setActivationCode] = useState('');
 
   useEffect(() => {
-    console.log('결제 성공:', { orderId, amount, plan });
+    console.log('결제 성공:', { orderId, amount, plan, referralCode });
 
     // 활성화 코드 조회
     fetchActivationCode();
@@ -34,7 +35,7 @@ function PurchaseSuccessContent() {
       clearTimeout(shrinkTimer);
       clearTimeout(detailsTimer);
     };
-  }, [orderId, amount, plan]);
+  }, [orderId, amount, plan, referralCode]);
 
   const fetchActivationCode = async () => {
     try {
@@ -133,6 +134,15 @@ function PurchaseSuccessContent() {
                   <span className="text-gray-600">결제 금액</span>
                   <span className="font-bold text-gray-900 text-lg">
                     ₩{Number(amount).toLocaleString()}
+                  </span>
+                </div>
+              )}
+
+              {referralCode && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">추천인 할인</span>
+                  <span className="font-semibold text-gray-900 text-sm">
+                    코드 {referralCode} 적용 (5% 할인)
                   </span>
                 </div>
               )}

@@ -3,12 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
+  const currentLocation = queryString ? `${pathname}?${queryString}` : pathname;
+  const loginHref =
+    currentLocation && currentLocation !== "/auth"
+      ? `/auth?redirect=${encodeURIComponent(currentLocation)}`
+      : "/auth";
 
   const handleLogout = async () => {
     try {
@@ -102,6 +111,13 @@ export default function Header() {
                         </p>
                       </div>
                       <Link
+                        href="/mypage"
+                        className="block px-4 py-2 text-sm text-card-foreground hover:bg-secondary transition-colors"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        마이페이지
+                      </Link>
+                      <Link
                         href="/orders"
                         className="block px-4 py-2 text-sm text-card-foreground hover:bg-secondary transition-colors"
                         onClick={() => setIsUserMenuOpen(false)}
@@ -121,7 +137,7 @@ export default function Header() {
             ) : (
               // 로그인되지 않은 상태
               <Link
-                href="/auth"
+                href={loginHref}
                 className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
                 로그인
@@ -216,6 +232,13 @@ export default function Header() {
                     </div>
                   </div>
                   <Link
+                    href="/mypage"
+                    className="text-foreground hover:text-primary transition-colors font-medium px-4 py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    마이페이지
+                  </Link>
+                  <Link
                     href="/orders"
                     className="text-foreground hover:text-primary transition-colors font-medium px-4 py-2"
                     onClick={() => setIsMenuOpen(false)}
@@ -235,7 +258,7 @@ export default function Header() {
               ) : (
                 // 모바일 - 로그인되지 않은 상태
                 <Link
-                  href="/auth"
+                  href={loginHref}
                   className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors mx-4"
                   onClick={() => setIsMenuOpen(false)}
                 >
