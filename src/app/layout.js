@@ -1,4 +1,5 @@
 import localFont from "next/font/local";
+import { Suspense } from "react";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuth";
 import Header from "@/components/Header";
@@ -27,7 +28,13 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>
             <div className="min-h-screen bg-background text-foreground flex flex-col">
-              <Header />
+              <Suspense
+                fallback={
+                  <div className="h-16 border-b border-border bg-background" />
+                }
+              >
+                <Header />
+              </Suspense>
               <main className="flex-1">{children}</main>
               <Footer />
             </div>

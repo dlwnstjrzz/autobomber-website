@@ -6,10 +6,15 @@ import { useRouter } from "next/navigation";
 
 export default function ProductSection() {
   const [selectedPlan, setSelectedPlan] = useState("trial"); // 'trial' or 'yearly'
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
 
   const handleTrialStart = async () => {
+    if (isStartingTrial) {
+      return;
+    }
+
     if (!user) {
       const redirectPath = `${window.location.pathname}${window.location.search}`;
       router.push(`/auth?redirect=${encodeURIComponent(redirectPath)}`);
@@ -17,6 +22,7 @@ export default function ProductSection() {
     }
 
     try {
+      setIsStartingTrial(true);
       // 체험 코드 생성 API 호출
       const response = await fetch('/api/trial/create', {
         method: 'POST',
@@ -34,11 +40,17 @@ export default function ProductSection() {
     } catch (error) {
       console.error('체험 시작 오류:', error);
       alert('체험 시작 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsStartingTrial(false);
     }
   };
 
   const handlePurchaseClick = (e) => {
     e.preventDefault();
+
+    if (selectedPlan === "trial" && isStartingTrial) {
+      return;
+    }
 
     if (selectedPlan === "trial") {
       handleTrialStart();
@@ -56,6 +68,18 @@ export default function ProductSection() {
   return (
     <section className="py-16" style={{ backgroundColor: "#1a1a1a" }}>
       <div className="container mx-auto px-4">
+        {isStartingTrial && (
+          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60">
+            <img
+              src="/image/loadingSpinner.gif"
+              alt="Loading..."
+              className="w-32 h-32 mb-4"
+            />
+            <p className="text-white text-lg font-semibold">
+              1일 무료 체험을 준비하고 있어요...
+            </p>
+          </div>
+        )}
         <div className="max-w-6xl mx-auto bg-card rounded-2xl shadow-lg overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-8 p-12">
             {/* 상품 영상 */}
@@ -184,14 +208,17 @@ export default function ProductSection() {
               <div className="pt-6">
                 <button
                   onClick={handlePurchaseClick}
+                  disabled={selectedPlan === "trial" ? isStartingTrial : false}
                   className={`cursor-pointer w-full py-4 px-6 rounded-lg font-semibold text-center transition-colors shadow-lg text-lg ${
                     selectedPlan === "trial"
                       ? "bg-green-600 text-white hover:bg-green-700"
                       : "bg-primary text-primary-foreground hover:bg-primary/90"
-                  }`}
+                  } ${selectedPlan === "trial" && isStartingTrial ? "opacity-80 cursor-not-allowed" : ""}`}
                 >
                   {selectedPlan === "trial"
-                    ? "1일 무료로 체험하기"
+                    ? isStartingTrial
+                      ? "체험 준비 중..."
+                      : "1일 무료로 체험하기"
                     : "1년 이용권 구매하기"}
                 </button>
               </div>

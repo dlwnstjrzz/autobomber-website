@@ -1,13 +1,16 @@
-"use client";
-
-// import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-// import { useEffect, useState } from "react";
-// import { useSearchParams } from "next/navigation";
-
-// const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-// const customerKey = "_RUcEb7t-ZHGOPTXlmKNs";
+import { Suspense } from "react";
 import { CheckoutPage } from "@/components/Checkout";
-// const generateRandomString = () => Math.random().toString(36).substring(2, 15);
+
 export default function BuyPage() {
-  return <CheckoutPage />;
+  return (
+    <Suspense
+      fallback={
+        <div className="wrapper w-100 flex items-center justify-center">
+          <p className="text-gray-600">결제 정보를 불러오는 중입니다...</p>
+        </div>
+      }
+    >
+      <CheckoutPage />
+    </Suspense>
+  );
 }

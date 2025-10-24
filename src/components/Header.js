@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -27,6 +28,26 @@ export default function Header() {
       console.error("로그아웃 실패:", error);
     }
   };
+
+  useEffect(() => {
+    if (!isUserMenuOpen) {
+      return;
+    }
+
+    const handleClickOutside = (event) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isUserMenuOpen]);
 
   return (
     <header
@@ -78,7 +99,7 @@ export default function Header() {
 
             {user ? (
               // 로그인된 상태 - 사용자 프로필 메뉴
-              <div className="relative">
+              <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
