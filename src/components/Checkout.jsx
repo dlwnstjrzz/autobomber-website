@@ -1,5 +1,7 @@
+"use client";
+
 import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useSearchParams } from "next/navigation";
 
@@ -236,15 +238,5 @@ function CheckoutContent() {
 }
 
 export function CheckoutPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="wrapper w-100 flex items-center justify-center">
-          <p className="text-gray-600">결제 정보를 불러오는 중입니다...</p>
-        </div>
-      }
-    >
-      <CheckoutContent />
-    </Suspense>
-  );
+  return <CheckoutContent />;
 }
