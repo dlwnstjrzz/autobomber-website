@@ -25,12 +25,8 @@ export default function HomeWithDiscount() {
     <>
       <HeroSection />
       <ProductSection />
-      {/* <MarginCalculator /> */}
 
-      <DiscountBanner
-        isVisible={showBanner}
-        discountData={discountData}
-      />
+      <DiscountBanner isVisible={showBanner} discountData={discountData} />
     </>
   );
 }

@@ -8,7 +8,7 @@ export default function DiscountBanner({ isVisible, discountData }) {
     days: 0,
     hours: 0,
     minutes: 0,
-    seconds: 0
+    seconds: 0,
   });
   const router = useRouter();
 
@@ -31,12 +31,14 @@ export default function DiscountBanner({ isVisible, discountData }) {
         days: Math.floor(totalSeconds / 86400),
         hours: Math.floor((totalSeconds % 86400) / 3600),
         minutes: Math.floor((totalSeconds % 3600) / 60),
-        seconds: totalSeconds % 60
+        seconds: totalSeconds % 60,
       });
     }, 1000);
 
     return () => clearInterval(timer);
   }, [isVisible, discountData]);
+
+  const formatTime = (value) => String(Math.max(0, value)).padStart(2, "0");
 
   const handlePurchase = () => {
     if (discountData?.code) {
@@ -46,63 +48,55 @@ export default function DiscountBanner({ isVisible, discountData }) {
 
   if (!isVisible) return null;
 
+  const timeSegments = [
+    { label: "시간", value: formatTime(timeLeft.hours + timeLeft.days * 24) },
+    { label: "분", value: formatTime(timeLeft.minutes) },
+    { label: "초", value: formatTime(timeLeft.seconds) },
+  ];
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-br from-gray-900 via-slate-800 to-black shadow-2xl">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-black shadow-xl">
       <div className="container mx-auto px-4 py-4">
-        <div className="grid grid-cols-3 items-center gap-8">
-          {/* 왼쪽: 할인 코드 */}
-          <div className="flex flex-col">
+        <div className="flex flex-wrap items-center justify-center gap-8 text-center md:text-left">
+          <div className="flex flex-col justify-center gap-1 text-white">
+            <p className="flex items-center justify-center md:justify-start gap-2 text-lg font-semibold">
+              <span>24시간만 10,000원 추가 할인</span>
+              <span role="img" aria-label="fire">
+                🔥
+              </span>
+            </p>
             {discountData?.code && (
-              <div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 text-lg font-semibold" style={{color: "#FCB700"}}>
-                    <span>🔥</span>
-                    <span>할인 코드: {discountData.code}</span>
-                    <span>🔥</span>
-                  </div>
-                  <div className="text-sm font-semibold text-red-400">
-                    24시간 후에 사라져요
-                  </div>
-                </div>
-              </div>
+              <p className="text-base text-gray-200">
+                할인 코드:{" "}
+                <span className="text-xl font-semibold text-white">
+                  {discountData.code}
+                </span>
+              </p>
             )}
           </div>
 
-          {/* 중앙: 타이머 */}
-          <div className="flex justify-center gap-6">
-            <div className="rounded-lg px-6 py-4 text-center min-w-[100px] bg-gray-800">
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-white text-4xl font-bold">{timeLeft.hours}</span>
-                <span className="text-gray-300 text-sm font-medium">시간</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-white">
+            {timeSegments.map((segment) => (
+              <div
+                key={segment.label}
+                className="flex flex-col items-center justify-center gap-1 leading-tight"
+              >
+                <div className="flex min-w-[62px] items-center justify-center rounded-md bg-[#F5CD2F] px-1.5 py-[3px] text-2xl font-bold text-gray-900 tracking-wide">
+                  {segment.value}
+                </div>
+                <span className="text-[11px] font-medium text-gray-300">
+                  {segment.label}
+                </span>
               </div>
-            </div>
-            <div className="rounded-lg px-6 py-4 text-center min-w-[100px] bg-gray-800">
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-white text-4xl font-bold">{timeLeft.minutes}</span>
-                <span className="text-gray-300 text-sm font-medium">분</span>
-              </div>
-            </div>
-            <div className="rounded-lg px-6 py-4 text-center min-w-[100px] bg-gray-800">
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-white text-4xl font-bold">{timeLeft.seconds}</span>
-                <span className="text-gray-300 text-sm font-medium">초</span>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* 오른쪽: 액션 버튼 */}
-          <div className="flex items-center justify-end gap-6">
-            <div className="text-center">
-              <div className="text-yellow-400 text-2xl font-bold">
-                🏆 추가 10,000원 할인!
-              </div>
-            </div>
-
+          <div className="flex items-center justify-center gap-4">
             <button
               onClick={handlePurchase}
-              className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 px-6 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg whitespace-nowrap"
+              className="cursor-pointer bg-[#FF6F1A] rounded-full px-6 py-3 text-base font-bold text-black transition-colors duration-200 hover:opacity-90 whitespace-nowrap"
             >
-              🔥 지금 바로 구매하기
+              지금 바로 구매
             </button>
           </div>
         </div>

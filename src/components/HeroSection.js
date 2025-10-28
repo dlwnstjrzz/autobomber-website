@@ -25,7 +25,7 @@ export default function HeroSection() {
       {/* 메인 비디오 */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-8 mt-2">
         <video
-          className="w-full h-auto rounded-2xl shadow-[0_0_100px_rgba(254,72,71,0.5)] border-2 border-primary/20 transition-all duration-500 hover:shadow-[0_0_120px_rgba(254,72,71,0.8)] hover:scale-[1.02]"
+          className="w-full h-auto rounded-2xl shadow-[0_0_100px_rgba(254,72,71,0.5)] border-2 border-primary/20 transition-all duration-500"
           autoPlay
           loop
           muted

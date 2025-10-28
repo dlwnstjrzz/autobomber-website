@@ -35,10 +35,7 @@ export default function Header() {
     }
 
     const handleClickOutside = (event) => {
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target)
-      ) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setIsUserMenuOpen(false);
       }
     };
@@ -59,7 +56,7 @@ export default function Header() {
           {/* 로고 */}
           <Link href="/" className="flex items-center">
             <Image
-              src="/image/logo.png"
+              src="/image/logo.svg"
               alt="자동화 폭격기 로고"
               width={60}
               height={60}
