@@ -285,7 +285,7 @@ export async function GET(request) {
     referralCode,
   });
 
-  const secretKey = "test_gsk_DnyRpQWGrNam9a7qAQEgVKwv1M9E"; // 시크릿 키는 환경변수로 관리
+  const secretKey = process.env.TOSSPAY_SECRET_KEY; // 시크릿 키는 환경변수로 관리
   const url = "https://api.tosspayments.com/v1/payments/confirm";
 
   try {

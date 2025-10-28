@@ -6,7 +6,7 @@ import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useSearchParams } from "next/navigation";
 
 const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
-const clientKey = "test_gck_Z1aOwX7K8mYJ1e7BWbRP8yQxzvNP";
+const clientKey = process.env.NEXT_PUBLIC_TOSSPAY_CLIENT_ID;
 const fallbackProduct = {
   name: "블로그 서이추 자동화 프로그램",
   price: 239000,
