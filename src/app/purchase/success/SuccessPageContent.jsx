@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -152,9 +152,11 @@ function PurchaseSuccessContent() {
             <div className="border-t border-gray-200 my-6"></div>
 
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-3">📖 사용 가이드</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">
+                📖 사용 가이드
+              </h3>
               <Link
-                href="/guide"
+                href="https://blog.naver.com/autobomber/223996758113"
                 className="flex items-center justify-center w-full py-3 px-4 text-white rounded-lg hover:opacity-90 transition-all text-sm font-medium"
                 style={{ backgroundColor: "#615EFF" }}
               >
@@ -163,7 +165,9 @@ function PurchaseSuccessContent() {
             </div>
 
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-3">💻 프로그램 다운로드</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">
+                💻 프로그램 다운로드
+              </h3>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => window.open("/download/windows", "_blank")}

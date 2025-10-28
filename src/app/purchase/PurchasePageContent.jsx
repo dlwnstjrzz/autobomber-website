@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,19 +10,26 @@ function PurchaseContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
-  const [userInfo, setUserInfo] = useState({
-    name: "",
-    phone: "",
-    email: user?.email || "",
-  });
+
+  const plan = searchParams.get("plan") || "yearly";
+  const trialCode = searchParams.get("code");
+  const trialError = searchParams.get("error");
+  const discountCodeFromQuery = (
+    searchParams.get("discountCode") || ""
+  ).toUpperCase();
+
   const [referralInput, setReferralInput] = useState("");
   const [referralDiscount, setReferralDiscount] = useState(null);
   const [applyingReferral, setApplyingReferral] = useState(false);
   const [referralError, setReferralError] = useState(null);
 
-  const plan = searchParams.get("plan") || "yearly";
-  const trialCode = searchParams.get("code");
-  const trialError = searchParams.get("error");
+  const [discountInput, setDiscountInput] = useState(discountCodeFromQuery);
+  const [discountInfo, setDiscountInfo] = useState(null);
+  const [applyingDiscount, setApplyingDiscount] = useState(false);
+  const [discountError, setDiscountError] = useState(null);
+
+  const hasAutoAppliedDiscount = useRef(false);
+  const lastReferralBasePriceRef = useRef(null);
 
   const planInfo = {
     trial: {
@@ -38,8 +45,166 @@ function PurchaseContent() {
   };
 
   const currentPlan = planInfo[plan] || planInfo.yearly;
-  const finalPrice = referralDiscount?.discountedPrice ?? currentPlan.price;
-  const discountAmount = referralDiscount?.discountAmount ?? 0;
+
+  const couponAmount = useMemo(() => {
+    if (!discountInfo || discountInfo.isExpired) return 0;
+
+    if (typeof discountInfo.discountAmount === "number") {
+      return Math.min(
+        currentPlan.price,
+        Math.max(0, Math.floor(discountInfo.discountAmount))
+      );
+    }
+
+    if (typeof discountInfo.discountedPrice === "number") {
+      const inferred = currentPlan.price - discountInfo.discountedPrice;
+      return Math.min(currentPlan.price, Math.max(0, Math.floor(inferred)));
+    }
+
+    return 0;
+  }, [discountInfo, currentPlan.price]);
+
+  const priceAfterCoupon = useMemo(
+    () => Math.max(0, currentPlan.price - couponAmount),
+    [currentPlan.price, couponAmount]
+  );
+
+  const referralAmount = useMemo(() => {
+    if (!referralDiscount?.discountAmount) return 0;
+    return Math.min(
+      priceAfterCoupon,
+      Math.max(0, Math.floor(referralDiscount.discountAmount))
+    );
+  }, [priceAfterCoupon, referralDiscount]);
+
+  const finalPrice = useMemo(
+    () => Math.max(0, priceAfterCoupon - referralAmount),
+    [priceAfterCoupon, referralAmount]
+  );
+
+  const applyDiscount = useCallback(
+    async ({ code, silent = false } = {}) => {
+      const targetCode = (code ?? discountInput ?? "").trim().toUpperCase();
+
+      if (!targetCode) {
+        if (!silent) {
+          toast.error("할인 코드를 입력해주세요.");
+        }
+        return;
+      }
+
+      try {
+        setApplyingDiscount(true);
+        setDiscountError(null);
+        setDiscountInput(targetCode);
+
+        const response = await fetch("/api/discount/status");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "할인 코드 확인에 실패했습니다.");
+        }
+
+        if (!data.hasDiscount || !data.discount) {
+          throw new Error("사용 가능한 할인 코드가 없습니다.");
+        }
+
+        if (data.discount.isExpired) {
+          throw new Error("할인 코드가 만료되었습니다.");
+        }
+
+        if ((data.discount.code || "").toUpperCase() !== targetCode) {
+          throw new Error("해당 할인 코드를 찾을 수 없습니다.");
+        }
+
+        setDiscountInfo(data.discount);
+        if (!silent) {
+          toast.success("할인 코드가 적용되었습니다.");
+        }
+      } catch (error) {
+        console.error(error);
+        setDiscountInfo(null);
+        setDiscountError(error.message);
+        if (!silent) {
+          toast.error(error.message);
+        }
+      } finally {
+        setApplyingDiscount(false);
+      }
+    },
+    [discountInput]
+  );
+
+  const handleRemoveDiscount = useCallback(() => {
+    setDiscountInfo(null);
+    setDiscountInput("");
+    setDiscountError(null);
+    lastReferralBasePriceRef.current = null;
+  }, []);
+
+  const applyReferral = useCallback(
+    async ({ code, silent = false, skipInputUpdate = false } = {}) => {
+      const targetCode = (code ?? referralInput ?? "").trim().toUpperCase();
+
+      if (!targetCode) {
+        if (!silent) {
+          toast.error("추천인 코드를 입력해주세요.");
+        }
+        return;
+      }
+
+      try {
+        setApplyingReferral(true);
+        setReferralError(null);
+        if (!skipInputUpdate) {
+          setReferralInput(targetCode);
+        }
+
+        const response = await fetch("/api/referrals/validate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            code: targetCode,
+            originalPrice: priceAfterCoupon,
+            plan,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || "추천인 코드 확인에 실패했습니다.");
+        }
+
+        setReferralDiscount(data.discount);
+        lastReferralBasePriceRef.current = priceAfterCoupon;
+        if (!silent) {
+          toast.success("추천인 할인이 적용되었습니다.");
+        }
+      } catch (error) {
+        console.error(error);
+        setReferralDiscount(null);
+        setReferralError(error.message);
+        if (!silent) {
+          toast.error(error.message);
+        } else {
+          lastReferralBasePriceRef.current = null;
+        }
+      } finally {
+        setApplyingReferral(false);
+      }
+    },
+    [plan, priceAfterCoupon, referralInput]
+  );
+
+  const handleRemoveReferral = useCallback(() => {
+    setReferralDiscount(null);
+    setReferralInput("");
+    setReferralError(null);
+    lastReferralBasePriceRef.current = null;
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -48,22 +213,41 @@ function PurchaseContent() {
           ? `${window.location.pathname}${window.location.search}`
           : `/purchase?plan=${plan}`;
       router.push(`/auth?redirect=${encodeURIComponent(redirectPath)}`);
+    }
+  }, [user, router, plan]);
+
+  useEffect(() => {
+    if (discountCodeFromQuery) {
+      setDiscountInput(discountCodeFromQuery);
+    }
+  }, [discountCodeFromQuery]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (!discountCodeFromQuery) return;
+    if (hasAutoAppliedDiscount.current) return;
+
+    hasAutoAppliedDiscount.current = true;
+    applyDiscount({ code: discountCodeFromQuery, silent: true });
+  }, [user, discountCodeFromQuery, applyDiscount]);
+
+  useEffect(() => {
+    if (!referralDiscount?.referralCode) {
+      lastReferralBasePriceRef.current = null;
       return;
     }
-    setUserInfo((prev) => ({ ...prev, email: user.email }));
-  }, [user, router]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserInfo((prev) => ({ ...prev, [name]: value }));
-  };
+    if (priceAfterCoupon === lastReferralBasePriceRef.current) return;
+    lastReferralBasePriceRef.current = priceAfterCoupon;
+
+    applyReferral({
+      code: referralDiscount.referralCode,
+      silent: true,
+      skipInputUpdate: true,
+    });
+  }, [applyReferral, priceAfterCoupon, referralDiscount?.referralCode]);
 
   const handlePayment = () => {
-    if (!userInfo.name || !userInfo.phone) {
-      alert("모든 정보를 입력해주세요.");
-      return;
-    }
-
     if (currentPlan.price === 0) {
       alert("무료 체험이 시작되었습니다!");
       router.push("/purchase/success?plan=trial");
@@ -75,11 +259,6 @@ function PurchaseContent() {
       price: finalPrice,
       description: currentPlan.description,
       plan,
-      buyer: {
-        name: userInfo.name,
-        phone: userInfo.phone,
-        email: userInfo.email,
-      },
       referral: referralDiscount
         ? {
             code: referralDiscount.referralCode,
@@ -91,6 +270,24 @@ function PurchaseContent() {
             discountRate: referralDiscount.discountRate,
           }
         : null,
+      coupon: discountInfo
+        ? {
+            code: discountInfo.code,
+            discountAmount: couponAmount,
+            originalPrice: discountInfo.originalPrice,
+            discountedPrice: discountInfo.discountedPrice,
+            expiresAt: discountInfo.expiresAt,
+          }
+        : null,
+      priceBreakdown: {
+        basePrice: currentPlan.price,
+        couponAmount,
+        referralAmount,
+        finalPrice,
+      },
+      buyer: {
+        email: user?.email || "",
+      },
     };
 
     const queryParams = new URLSearchParams({
@@ -102,209 +299,193 @@ function PurchaseContent() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다</h1>
+          <h1 className="mb-4 text-2xl font-bold">로그인이 필요합니다</h1>
           <p>결제를 위해 먼저 로그인해주세요.</p>
         </div>
       </div>
     );
   }
 
-  const handleApplyReferral = async () => {
-    if (!referralInput.trim()) {
-      toast.error("추천인 코드를 입력해주세요.");
-      return;
-    }
-
-    try {
-      setApplyingReferral(true);
-      setReferralError(null);
-      const response = await fetch("/api/referrals/validate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          code: referralInput,
-          originalPrice: currentPlan.price,
-          plan,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || "추천인 코드 확인에 실패했습니다.");
-      }
-
-      setReferralDiscount(data.discount);
-      toast.success("추천인 할인이 적용되었습니다.");
-    } catch (error) {
-      console.error(error);
-      setReferralDiscount(null);
-      setReferralError(error.message);
-      toast.error(error.message);
-    } finally {
-      setApplyingReferral(false);
-    }
-  };
-
-  const handleRemoveReferral = () => {
-    setReferralDiscount(null);
-    setReferralInput("");
-    setReferralError(null);
-  };
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-[#161616] text-foreground">
+      <div className="container mx-auto px-4 py-12">
+        <div className="mx-auto max-w-lg space-y-6">
           {plan === "trial" ? (
-            <TrialComponent
-              trialCode={trialCode}
-              trialError={trialError}
-              onTrialSuccess={(data) => {
-                console.log("체험 시작 성공:", data);
-              }}
-            />
+            <section className="rounded-[28px] p-6">
+              <TrialComponent
+                trialCode={trialCode}
+                trialError={trialError}
+                onTrialSuccess={(data) => {
+                  console.log("체험 시작 성공:", data);
+                }}
+              />
+            </section>
           ) : (
             <>
-              <div className="bg-card text-card-foreground rounded-lg p-6 mb-8">
-                <h2 className="text-2xl font-bold mb-4">선택한 상품</h2>
-                <div className="border-b border-border pb-4 mb-4">
-                  <h3 className="text-xl font-semibold">{currentPlan.name}</h3>
-                  <p className="text-muted-foreground mt-2">
-                    {currentPlan.description}
-                  </p>
-                  <div className="mt-4">
-                    {discountAmount > 0 ? (
-                      <div className="flex flex-col gap-1">
-                        <div className="text-sm text-muted-foreground line-through">
-                          ₩{currentPlan.price.toLocaleString()}
+              <section className="mt-16 rounded-[28px] bg-[#F3F4F6] p-8 shadow-[0_24px_48px_rgba(0,0,0,0.18)]">
+                <div className="space-y-7">
+                  <header className="space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8B95A1]">
+                      주문 요약
+                    </p>
+                    <h2 className="text-2xl font-semibold text-[#191F28]">
+                      {currentPlan.name}
+                    </h2>
+                    <p className="text-sm leading-relaxed text-[#4E5968]">
+                      {currentPlan.description}
+                    </p>
+                  </header>
+
+                  <div className="rounded-2xl border border-[#ECEFF3] bg-[#F9FAFB] px-4 py-5 text-sm text-[#4E5968]">
+                    <div className="flex items-center justify-between">
+                      <span>상품 금액</span>
+                      <span className="font-medium text-[#191F28]">
+                        ₩{currentPlan.price.toLocaleString()}
+                      </span>
+                    </div>
+                    {couponAmount > 0 && (
+                      <div className="mt-2 flex items-center justify-between">
+                        <span>할인 코드</span>
+                        <span className="font-semibold text-[#F43099]">
+                          -₩{couponAmount.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    {referralAmount > 0 && (
+                      <div className="mt-2 flex items-center justify-between">
+                        <span>추천인 할인</span>
+                        <span className="font-semibold text-[#00D3BB]">
+                          -₩{referralAmount.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    <div className="my-3 h-px bg-[#ECEFF3]" />
+                    <div className="flex items-center justify-between text-base font-semibold text-[#191F28]">
+                      <span>총 결제 금액</span>
+                      <span className="text-[#0164FF]">
+                        ₩{finalPrice.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {discountInfo ? (
+                      <div className="flex items-center justify-between rounded-2xl border border-[#ECEFF3] bg-[#F9FAFB] px-5 py-4">
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8B95A1]">
+                            할인 코드 적용됨
+                          </p>
+                          <p className="mt-1 text-base font-semibold text-[#191F28]">
+                            #{discountInfo.code}
+                          </p>
+                          <p className="mt-1 text-xs font-semibold text-[#F43099]">
+                            -₩{couponAmount.toLocaleString()} 즉시 할인
+                          </p>
                         </div>
-                        <div className="text-3xl font-bold text-primary">
-                          ₩{finalPrice.toLocaleString()}
-                        </div>
-                        <div className="text-sm text-green-500">
-                          추천인 할인 -₩{discountAmount.toLocaleString()} (5%)
-                        </div>
+                        <button
+                          onClick={handleRemoveDiscount}
+                          className="rounded-lg border border-[#ECEFF3] px-4 py-2 text-sm font-medium text-[#4E5968] transition hover:bg-[#F0F2F5]"
+                        >
+                          코드 제거
+                        </button>
                       </div>
                     ) : (
-                      <span className="text-3xl font-bold text-primary">
-                        {currentPlan.price === 0
-                          ? "무료"
-                          : `₩${currentPlan.price.toLocaleString()}`}
-                      </span>
+                      <div className="flex flex-col gap-3 rounded-2xl border border-[#ECEFF3] px-4 py-3 sm:flex-row sm:items-center">
+                        <label className="text-sm font-medium text-[#8B95A1] sm:w-[120px]">
+                          할인 코드
+                        </label>
+                        <div className="flex w-full flex-col gap-3 sm:flex-1 sm:flex-row">
+                          <input
+                            type="text"
+                            value={discountInput}
+                            onChange={(e) =>
+                              setDiscountInput(e.target.value.toUpperCase())
+                            }
+                            className="flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
+                            placeholder="할인 코드를 입력하세요"
+                            maxLength={12}
+                          />
+                          <button
+                            onClick={() => applyDiscount({})}
+                            disabled={applyingDiscount}
+                            className="inline-flex items-center justify-center rounded-lg bg-[#0164FF] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#0052CC] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
+                          >
+                            {applyingDiscount ? "확인 중..." : "적용"}
+                          </button>
+                        </div>
+                      </div>
                     )}
-                    {plan === "yearly" && discountAmount === 0 && (
-                      <span className="ml-2 text-sm text-muted-foreground line-through">
-                        ₩550,000
-                      </span>
+                    {!discountInfo && discountError && (
+                      <p className="text-sm text-[#F43099]">{discountError}</p>
+                    )}
+
+                    {referralDiscount ? (
+                      <div className="flex items-center justify-between rounded-2xl border border-[#ECEFF3] bg-[#F9FAFB] px-5 py-4">
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8B95A1]">
+                            추천인 코드 적용됨
+                          </p>
+                          <p className="mt-1 text-base font-semibold text-[#191F28]">
+                            {referralDiscount.referralCode}
+                          </p>
+                          <p className="mt-1 text-xs font-semibold text-[#00D3BB]">
+                            -₩{referralAmount.toLocaleString()} 할인 (5%)
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleRemoveReferral}
+                          className="rounded-lg border border-[#ECEFF3] px-4 py-2 text-sm font-medium text-[#4E5968] transition hover:bg-[#F0F2F5]"
+                        >
+                          코드 제거
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3 rounded-2xl border border-[#ECEFF3] px-4 py-3 sm:flex-row sm:items-center">
+                        <label className="text-sm font-medium text-[#8B95A1] sm:w-[120px]">
+                          추천인 코드
+                        </label>
+                        <div className="flex w-full flex-col gap-3 sm:flex-1 sm:flex-row">
+                          <input
+                            type="text"
+                            value={referralInput}
+                            onChange={(e) =>
+                              setReferralInput(e.target.value.toUpperCase())
+                            }
+                            className="flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
+                            placeholder="추천인 코드를 입력하세요"
+                            maxLength={12}
+                          />
+                          <button
+                            onClick={() => applyReferral({})}
+                            disabled={applyingReferral}
+                            className="inline-flex items-center justify-center rounded-lg bg-[#0164FF] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#0052CC] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
+                          >
+                            {applyingReferral ? "확인 중..." : "적용"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {!referralDiscount && referralError && (
+                      <p className="text-sm text-[#F43099]">{referralError}</p>
                     )}
                   </div>
-                </div>
-              </div>
 
-              <div className="bg-card text-card-foreground rounded-lg p-6 mb-8 border border-border">
-                <div className="flex flex-col gap-3">
-                  <div>
-                    <h2 className="text-2xl font-bold">추천인 코드</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      추천인 코드를 입력하면 5% 할인을 받을 수 있어요. 계정당
-                      1회만 적용됩니다.
+                  <div className="space-y-3">
+                    <button
+                      onClick={handlePayment}
+                      className="w-full mt-8 rounded-2xl bg-[#0164FF] py-4 text-lg font-semibold text-white transition hover:bg-[#0052CC]"
+                    >
+                      ₩{finalPrice.toLocaleString()} 결제하기
+                    </button>
+                    <p className="text-center text-xs text-[#8B95A1]">
+                      <span className="mr-1 text-[#FCB700]">🔒</span>
+                      Toss Payments를 통해 안전하게 결제됩니다.
                     </p>
                   </div>
-
-                  {referralDiscount ? (
-                    <div className="bg-muted rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          적용된 추천인 코드
-                        </p>
-                        <p className="text-xl font-semibold">
-                          {referralDiscount.referralCode}
-                        </p>
-                      </div>
-                      <button
-                        onClick={handleRemoveReferral}
-                        className="px-4 py-2 text-sm font-medium bg-white text-black rounded-md border border-border hover:bg-gray-100 transition"
-                      >
-                        코드 제거
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <input
-                        type="text"
-                        value={referralInput}
-                        onChange={(e) =>
-                          setReferralInput(e.target.value.toUpperCase())
-                        }
-                        className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                        placeholder="추천인 코드를 입력하세요"
-                        maxLength={12}
-                      />
-                      <button
-                        onClick={handleApplyReferral}
-                        disabled={applyingReferral}
-                        className="px-5 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {applyingReferral ? "확인 중..." : "적용하기"}
-                      </button>
-                    </div>
-                  )}
-
-                  {!referralDiscount && referralError && (
-                    <p className="text-sm text-red-500">{referralError}</p>
-                  )}
                 </div>
-              </div>
-
-              <div className="bg-card text-card-foreground rounded-lg p-6 mb-8">
-                <h2 className="text-2xl font-bold mb-4">구매자 정보</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      이름 *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={userInfo.name}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                      placeholder="이름을 입력하세요"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      전화번호 *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={userInfo.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                      placeholder="010-1234-5678"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <button
-                  onClick={handlePayment}
-                  className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-colors ${
-                    "bg-primary hover:bg-primary/90"
-                  } text-white`}
-                >
-                  {`₩${finalPrice.toLocaleString()} 결제하기`}
-                </button>
-              </div>
+              </section>
             </>
           )}
         </div>
