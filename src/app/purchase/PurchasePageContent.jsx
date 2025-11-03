@@ -403,7 +403,7 @@ function PurchaseContent() {
                             onChange={(e) =>
                               setDiscountInput(e.target.value.toUpperCase())
                             }
-                            className="flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
+                            className="w-full flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
                             placeholder="할인 코드를 입력하세요"
                             maxLength={12}
                           />
@@ -446,14 +446,14 @@ function PurchaseContent() {
                         <label className="text-sm font-medium text-[#8B95A1] sm:w-[120px]">
                           추천인 코드
                         </label>
-                        <div className="flex w-full flex-row gap-3 sm:flex-1 sm:flex-nowrap">
+                        <div className="flex flex-row gap-3 sm:flex-1 sm:flex-nowrap">
                           <input
                             type="text"
                             value={referralInput}
                             onChange={(e) =>
                               setReferralInput(e.target.value.toUpperCase())
                             }
-                            className="flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
+                            className="w-full flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
                             placeholder="추천인 코드를 입력하세요"
                             maxLength={12}
                           />
