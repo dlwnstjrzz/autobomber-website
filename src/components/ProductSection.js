@@ -66,8 +66,8 @@ export default function ProductSection() {
     router.push(`/purchase?plan=yearly`);
   };
   return (
-    <section className="py-16" style={{ backgroundColor: "#1a1a1a" }}>
-      <div className="container mx-auto px-4">
+    <section className="pt-0 pb-16 sm:py-16 bg-card sm:bg-[#1a1a1a]">
+      <div className="mx-auto w-full max-w-7xl px-1 sm:px-4">
         {isStartingTrial && (
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60">
             <img
@@ -81,7 +81,7 @@ export default function ProductSection() {
           </div>
         )}
         <div className="max-w-6xl mx-auto bg-card rounded-2xl shadow-lg overflow-hidden">
-          <div className="flex flex-col lg:flex-row gap-8 p-12">
+          <div className="flex flex-col lg:flex-row gap-8 p-6 sm:p-12">
             {/* 상품 영상 */}
             <div className="lg:w-[55%]">
               <div className="rounded-lg overflow-hidden bg-secondary">
@@ -169,11 +169,11 @@ export default function ProductSection() {
                         1년 이용권
                       </div>
                       <div className="mt-2">
-                        <div className="flex items-center justify-center space-x-2">
-                          <span className="text-2xl font-bold text-primary">
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-0 sm:space-x-2">
+                          <span className="text-xl sm:text-2xl font-bold text-primary">
                             ₩239,000
                           </span>
-                          <span className="text-sm text-muted-foreground line-through">
+                          <span className="text-xs sm:text-sm text-muted-foreground line-through">
                             ₩550,000
                           </span>
                         </div>
@@ -227,7 +227,7 @@ export default function ProductSection() {
         </div>
 
         {/* 상세 페이지 이미지들 */}
-        <div className="max-w-4xl mx-auto mt-16 space-y-4">
+        <div className="mt-16 space-y-4 -mx-1 sm:mx-auto sm:max-w-4xl sm:px-4">
           {Array.from({ length: 20 }, (_, index) => (
             <div key={index + 1} className="w-full">
               <img
@@ -235,7 +235,7 @@ export default function ProductSection() {
                   index + 1
                 }.jpeg`}
                 alt={`상품 상세 이미지 ${index + 1}`}
-                className="w-full h-auto rounded-lg shadow-sm"
+                className="w-full h-auto sm:rounded-lg sm:shadow-sm"
                 loading="lazy"
               />
             </div>
