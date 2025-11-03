@@ -396,21 +396,21 @@ function PurchaseContent() {
                         <label className="text-sm font-medium text-[#8B95A1] sm:w-[120px]">
                           할인 코드
                         </label>
-                        <div className="flex w-full gap-3 sm:flex-1 sm:flex-nowrap">
+                        <div className="flex w-full justify-between gap-3 sm:flex-1 sm:flex-nowrap">
                           <input
                             type="text"
                             value={discountInput}
                             onChange={(e) =>
                               setDiscountInput(e.target.value.toUpperCase())
                             }
-                            className="sm:flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
+                            className="flex-1 rounded-lg border border-transparent bg-white px-4 py-2 text-sm font-medium tracking-wide text-[#191F28] placeholder:text-[#A3ACB8] focus:border-[#615EFF] focus:outline-none focus:ring-2 focus:ring-[#615EFF]/30"
                             placeholder="할인 코드를 입력하세요"
                             maxLength={12}
                           />
                           <button
                             onClick={() => applyDiscount({})}
                             disabled={applyingDiscount}
-                            className="inline-flex items-center justify-center rounded-lg bg-[#0164FF] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#0052CC] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
+                            className="items-center justify-center rounded-lg bg-[#0164FF] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#0052CC] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
                           >
                             {applyingDiscount ? "확인 중..." : "적용"}
                           </button>
@@ -472,10 +472,10 @@ function PurchaseContent() {
                     )}
                   </div>
 
-                  <div className="space-y-3 px-4 sm:px-0">
+                  <div className="space-y-3 px-4">
                     <button
                       onClick={handlePayment}
-                      className="w-full mt-8 rounded-xl bg-[#0164FF] py-3 text-base sm:py-4 sm:text-lg font-semibold text-white transition hover:bg-[#0052CC]"
+                      className="w-full mt-8 rounded-xl bg-[#0164FF] py-3 text-base sm:text-lg font-semibold text-white transition hover:bg-[#0052CC]"
                     >
                       ₩{finalPrice.toLocaleString()} 결제하기
                     </button>
