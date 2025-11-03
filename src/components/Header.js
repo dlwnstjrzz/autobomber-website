@@ -197,6 +197,34 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col space-y-4">
+              {user && (
+                <div className="px-4 py-3 border-b border-border">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-muted overflow-hidden border-2 border-primary">
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt="프로필 이미지"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-sm font-bold text-muted-foreground">
+                          {user.displayName?.[0] || "U"}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {user.displayName || "사용자"}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <Link
                 href="/notices"
                 className="text-foreground hover:text-primary transition-colors font-medium px-4 py-2"
@@ -220,48 +248,14 @@ export default function Header() {
               >
                 주문조회
               </Link>
-
               {user ? (
-                // 모바일 - 로그인된 상태
                 <>
-                  <div className="px-4 py-2 border-b border-border">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-muted overflow-hidden border-2 border-primary">
-                        {user.photoURL ? (
-                          <img
-                            src={user.photoURL}
-                            alt="프로필 이미지"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-sm font-bold text-muted-foreground">
-                            {user.displayName?.[0] || "U"}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">
-                          {user.displayName || "사용자"}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                   <Link
                     href="/mypage"
                     className="text-foreground hover:text-primary transition-colors font-medium px-4 py-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     마이페이지
-                  </Link>
-                  <Link
-                    href="/orders"
-                    className="text-foreground hover:text-primary transition-colors font-medium px-4 py-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    주문조회
                   </Link>
                   <button
                     onClick={() => {
@@ -274,7 +268,6 @@ export default function Header() {
                   </button>
                 </>
               ) : (
-                // 모바일 - 로그인되지 않은 상태
                 <Link
                   href={loginHref}
                   className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors mx-4"

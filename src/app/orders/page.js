@@ -147,70 +147,66 @@ export default function OrdersPage() {
           ) : (
             <div className="space-y-3">
               {/* 1년 이용권 목록 */}
-              {licenses.map((license, index) => (
+              {licenses.map((license) => (
                 <div
                   key={license.orderId}
                   className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-blue-300"
                 >
-                  <div className="flex items-center gap-4">
-                    {/* 제품 썸네일 */}
-                    <div className="w-14 h-14 flex-shrink-0">
-                      <video
-                        src="/video/blogAutoThumb.mp4"
-                        autoPlay
-                        loop
-                        muted
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-
-                    {/* 제품 정보 */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-card-foreground text-sm">
-                        서이추 블로그 자동화 프로그램
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        1년 이용권
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        239,000 / 1개
-                      </p>
-                    </div>
-
-                    {/* 제품 코드 */}
-                    <div className="text-center mr-8">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        제품 코드
-                      </p>
-                      <div
-                        className="font-mono text-sm font-medium text-card-foreground cursor-pointer hover:text-blue-600 transition-colors"
-                        onClick={() => copyToClipboard(license.code)}
-                      >
-                        {license.code}
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 flex-shrink-0">
+                        <video
+                          src="/video/blogAutoThumb.mp4"
+                          autoPlay
+                          loop
+                          muted
+                          className="object-cover w-full h-full rounded-md"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-card-foreground text-sm sm:text-base">
+                          서이추 블로그 자동화 프로그램
+                        </h3>
+                        <p className="text-xs text-muted-foreground sm:text-sm">
+                          1년 이용권
+                        </p>
+                        <p className="text-xs text-muted-foreground sm:text-sm">
+                          239,000 / 1개
+                        </p>
                       </div>
                     </div>
 
-                    {/* 만료일 */}
-                    <div className="text-center mr-8">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        만료일
-                      </p>
-                      <p className="text-sm font-medium text-card-foreground">
-                        {formatExpiryDate(license.expiresAt, false)}
-                      </p>
-                    </div>
-
-                    {/* 상태 */}
-                    <div className="text-right">
-                      <span
-                        className={`text-sm font-medium ${
-                          license.isExpired
-                            ? "text-[#F43099]"
-                            : "text-[#615EFF]"
-                        }`}
-                      >
-                        {license.isExpired ? "만료됨" : "이용중"}
-                      </span>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 w-full sm:flex sm:items-center sm:gap-6 sm:w-auto sm:ml-auto">
+                      <div className="flex flex-col">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          제품 코드
+                        </p>
+                        <div
+                          className="font-mono text-sm sm:text-base font-medium text-card-foreground cursor-pointer hover:text-blue-600 transition-colors break-all"
+                          onClick={() => copyToClipboard(license.code)}
+                        >
+                          {license.code}
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          만료일
+                        </p>
+                        <p className="text-sm sm:text-base font-medium text-card-foreground leading-tight break-words">
+                          {formatExpiryDate(license.expiresAt, false)}
+                        </p>
+                      </div>
+                      <div className="col-span-2 flex justify-center sm:col-span-1 sm:justify-end">
+                        <span
+                          className={`text-sm sm:text-base font-medium ${
+                            license.isExpired
+                              ? "text-[#F43099]"
+                              : "text-[#615EFF]"
+                          }`}
+                        >
+                          {license.isExpired ? "만료됨" : "이용중"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -219,65 +215,61 @@ export default function OrdersPage() {
               {/* 무료 체험 */}
               {trialData && (
                 <div className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-blue-300">
-                  <div className="flex items-center gap-4">
-                    {/* 제품 썸네일 */}
-                    <div className="w-14 h-14 flex-shrink-0">
-                      <video
-                        src="/video/blogAutoThumb.mp4"
-                        autoPlay
-                        loop
-                        muted
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-
-                    {/* 제품 정보 */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-card-foreground text-sm">
-                        서이추 블로그 자동화 프로그램
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        1일 무료체험
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        무료 / 1개
-                      </p>
-                    </div>
-
-                    {/* 체험 코드 */}
-                    <div className="text-center mr-8">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        체험 코드
-                      </p>
-                      <div
-                        className="font-mono text-sm font-medium text-card-foreground cursor-pointer hover:text-blue-600 transition-colors"
-                        onClick={() => copyToClipboard(trialData.code)}
-                      >
-                        {trialData.code}
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 flex-shrink-0">
+                        <video
+                          src="/video/blogAutoThumb.mp4"
+                          autoPlay
+                          loop
+                          muted
+                          className="object-cover w-full h-full rounded-md"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-card-foreground text-sm sm:text-base">
+                          서이추 블로그 자동화 프로그램
+                        </h3>
+                        <p className="text-xs text-muted-foreground sm:text-sm">
+                          1일 무료체험
+                        </p>
+                        <p className="text-xs text-muted-foreground sm:text-sm">
+                          무료 / 1개
+                        </p>
                       </div>
                     </div>
 
-                    {/* 만료일 */}
-                    <div className="text-center mr-8">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        만료일
-                      </p>
-                      <p className="text-sm font-medium text-card-foreground">
-                        {formatExpiryDate(trialData.expiresAt, false)}
-                      </p>
-                    </div>
-
-                    {/* 상태 */}
-                    <div className="text-right">
-                      <span
-                        className={`text-sm font-medium ${
-                          trialData.isExpired
-                            ? "text-[#F43099]"
-                            : "text-[#00D3BB]"
-                        }`}
-                      >
-                        {trialData.isExpired ? "만료됨" : "체험중"}
-                      </span>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 w-full sm:flex sm:items-center sm:gap-6 sm:w-auto sm:ml-auto">
+                      <div className="flex flex-col">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          체험 코드
+                        </p>
+                        <div
+                          className="font-mono text-sm sm:text-base font-medium text-card-foreground cursor-pointer hover:text-blue-600 transition-colors break-all"
+                          onClick={() => copyToClipboard(trialData.code)}
+                        >
+                          {trialData.code}
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          만료일
+                        </p>
+                        <p className="text-sm sm:text-base font-medium text-card-foreground leading-tight break-words">
+                          {formatExpiryDate(trialData.expiresAt, false)}
+                        </p>
+                      </div>
+                      <div className="col-span-2 flex justify-center sm:col-span-1 sm:justify-end">
+                        <span
+                          className={`text-sm sm:text-base font-medium ${
+                            trialData.isExpired
+                              ? "text-[#F43099]"
+                              : "text-[#00D3BB]"
+                          }`}
+                        >
+                          {trialData.isExpired ? "만료됨" : "체험중"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

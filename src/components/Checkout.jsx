@@ -180,7 +180,7 @@ function CheckoutContent() {
           </div>
         </section>
 
-        <aside className="flex flex-col w-[210px] justify-between bg-[#F2F4F6] p-6 py-8">
+        <aside className="hidden md:flex md:flex-col md:w-[210px] md:justify-between bg-[#F2F4F6] p-6 py-8">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-[#8B95A1]">상품명</span>
