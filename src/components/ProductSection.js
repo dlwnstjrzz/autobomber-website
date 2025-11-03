@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -9,6 +9,16 @@ export default function ProductSection() {
   const [isStartingTrial, setIsStartingTrial] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const planSectionRef = useRef(null);
+
+  const scrollToPlans = () => {
+    if (planSectionRef.current) {
+      planSectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
 
   const handleTrialStart = async () => {
     if (isStartingTrial) {
@@ -24,8 +34,8 @@ export default function ProductSection() {
     try {
       setIsStartingTrial(true);
       // 체험 코드 생성 API 호출
-      const response = await fetch('/api/trial/create', {
-        method: 'POST',
+      const response = await fetch("/api/trial/create", {
+        method: "POST",
       });
 
       const data = await response.json();
@@ -35,11 +45,13 @@ export default function ProductSection() {
         router.push(`/purchase?plan=trial&code=${data.trial.code}`);
       } else {
         // 실패시 에러와 함께 purchase 페이지로 이동 (이미 사용한 계정 등)
-        router.push(`/purchase?plan=trial&error=${encodeURIComponent(data.error)}`);
+        router.push(
+          `/purchase?plan=trial&error=${encodeURIComponent(data.error)}`
+        );
       }
     } catch (error) {
-      console.error('체험 시작 오류:', error);
-      alert('체험 시작 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error("체험 시작 오류:", error);
+      alert("체험 시작 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsStartingTrial(false);
     }
@@ -66,7 +78,10 @@ export default function ProductSection() {
     router.push(`/purchase?plan=yearly`);
   };
   return (
-    <section className="pt-0 pb-16 sm:py-16 bg-card sm:bg-[#1a1a1a]">
+    <section
+      className="pt-0 pb-16 sm:py-16 bg-card sm:bg-[#1a1a1a]"
+      ref={planSectionRef}
+    >
       <div className="mx-auto w-full max-w-7xl px-1 sm:px-4">
         {isStartingTrial && (
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60">
@@ -91,7 +106,7 @@ export default function ProductSection() {
                   loop
                   muted
                   playsInline
-                  className="w-full h-auto"
+                  className="w-full h-auto cursor-pointer"
                 >
                   브라우저가 비디오를 지원하지 않습니다.
                 </video>
@@ -213,7 +228,11 @@ export default function ProductSection() {
                     selectedPlan === "trial"
                       ? "bg-green-600 text-white hover:bg-green-700"
                       : "bg-primary text-primary-foreground hover:bg-primary/90"
-                  } ${selectedPlan === "trial" && isStartingTrial ? "opacity-80 cursor-not-allowed" : ""}`}
+                  } ${
+                    selectedPlan === "trial" && isStartingTrial
+                      ? "opacity-80 cursor-not-allowed"
+                      : ""
+                  }`}
                 >
                   {selectedPlan === "trial"
                     ? isStartingTrial
@@ -231,13 +250,52 @@ export default function ProductSection() {
           {Array.from({ length: 20 }, (_, index) => (
             <div key={index + 1} className="w-full">
               <img
-                src={`/image/blog_automation/블로그 서이추 자동화 상세페이지 초안_${
+                src={`/image/blog_automation/자동화 폭격기 최종 완성본_${
                   index + 1
-                }.jpeg`}
+                }.png`}
                 alt={`상품 상세 이미지 ${index + 1}`}
                 className="w-full h-auto sm:rounded-lg sm:shadow-sm"
                 loading="lazy"
               />
+              {index + 1 === 1 ? (
+                <video
+                  src="/video/상세페이지1.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto cursor-pointer"
+                  onClick={scrollToPlans}
+                ></video>
+              ) : (
+                ""
+              )}
+              {index + 1 === 11 ? (
+                <video
+                  src="/video/상세페이지3.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto cursor-pointer"
+                  onClick={scrollToPlans}
+                ></video>
+              ) : (
+                ""
+              )}
+              {index + 1 === 19 ? (
+                <video
+                  src="/video/상세페이지4.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto cursor-pointer"
+                  onClick={scrollToPlans}
+                ></video>
+              ) : (
+                ""
+              )}
             </div>
           ))}
         </div>

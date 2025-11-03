@@ -9,22 +9,25 @@ export default function Footer() {
           <div className="text-left space-y-4 mb-6">
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>
-                <span className="font-semibold">상호:</span> 주식회사 만월 | <span className="font-semibold">대표:</span> 손재경
+                <span className="font-semibold">상호:</span> 주식회사 만월 |{" "}
+                <span className="font-semibold">대표:</span> 손재경
               </p>
               <p>
-                <span className="font-semibold">사업자 등록번호:</span> 325-86-03628
+                <span className="font-semibold">사업자 등록번호:</span>{" "}
+                325-86-03628
               </p>
               <p>
-                <span className="font-semibold">주소:</span> 경기도 파주시 경의로 1092, 808-A157호
+                <span className="font-semibold">주소:</span> 경기도 파주시
+                경의로 1092, 808-A157호
               </p>
               <p>
-                <span className="font-semibold">전화번호:</span> 070-7954-7879 | <span className="font-semibold">이메일:</span> official@autobomber.com
+                <span className="font-semibold">전화번호:</span> 070-7954-7879 |{" "}
+                <span className="font-semibold">이메일:</span>{" "}
+                official@autobomber.com
               </p>
               <p>
-                <span className="font-semibold">통신판매신고번호:</span> 제2025-경기파주-1640호
-              </p>
-              <p>
-                교환 및 반품 안내 환불 및 교환은 서비스 구매일로부터 7일 이내에 요청하셔야 합니다. 구매일로부터 7일 이내에 요청하시면 전액 환불이 가능합니다. 7일 이후에는 환불이 어려운 점 양해 부탁드립니다.
+                <span className="font-semibold">통신판매신고번호:</span>{" "}
+                제2025-경기파주-1640호
               </p>
             </div>
           </div>
