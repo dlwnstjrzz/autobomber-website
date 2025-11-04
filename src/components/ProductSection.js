@@ -254,7 +254,7 @@ export default function ProductSection() {
                   index + 1
                 }.png`}
                 alt={`상품 상세 이미지 ${index + 1}`}
-                className="w-full h-auto sm:rounded-lg sm:shadow-sm"
+                className="block h-auto max-w-full sm:rounded-lg sm:shadow-sm mx-auto"
                 loading="lazy"
               />
               {index + 1 === 1 ? (
@@ -279,6 +279,30 @@ export default function ProductSection() {
                   playsInline
                   className="w-full h-auto cursor-pointer"
                   onClick={scrollToPlans}
+                ></video>
+              ) : (
+                ""
+              )}
+              {index + 1 === 2 ? (
+                <video
+                  src="/video/상세페이지서이추영상.mov"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto cursor-pointer mt-[-2px]"
+                ></video>
+              ) : (
+                ""
+              )}
+              {index + 1 === 4 ? (
+                <video
+                  src="/video/상세페이지서이추만.mov"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto cursor-pointer mt-[-2px]"
                 ></video>
               ) : (
                 ""
