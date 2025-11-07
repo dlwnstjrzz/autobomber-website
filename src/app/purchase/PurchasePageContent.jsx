@@ -475,7 +475,7 @@ function PurchaseContent() {
                   <div className="space-y-3 px-4">
                     <button
                       onClick={handlePayment}
-                      className="w-full mt-8 rounded-xl bg-[#0164FF] py-3 text-base sm:text-lg font-semibold text-white transition hover:bg-[#0052CC]"
+                      className="cursor-pointer w-full mt-8 rounded-xl bg-[#0164FF] py-3 text-base sm:text-lg font-semibold text-white transition hover:bg-[#0052CC]"
                     >
                       ₩{finalPrice.toLocaleString()} 결제하기
                     </button>

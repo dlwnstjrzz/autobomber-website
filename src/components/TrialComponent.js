@@ -260,20 +260,24 @@ export default function TrialComponent({
         <div className="border border-gray-200 rounded-lg p-4">
           <h3 className="font-medium text-gray-900 mb-3">프로그램 다운로드</h3>
           <div className="grid grid-cols-2 gap-2">
-            <button
+            <a
               className="flex items-center justify-center px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors text-sm text-gray-700"
-              onClick={() => alert("Windows용 다운로드 준비중")}
+              href="https://github.com/dlwnstjrzz/python_naver_blog/releases/latest/download/NaverBlogAutomation-Windows.zip"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <FaWindows className="w-4 h-4 mr-2 text-blue-600" />
               Windows
-            </button>
-            <button
+            </a>
+            <a
               className="flex items-center justify-center px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-colors text-sm text-gray-700"
-              onClick={() => alert("Mac용 다운로드 준비중")}
+              href="https://github.com/dlwnstjrzz/python_naver_blog/releases/latest/download/NaverBlogAutomation-macOS.zip"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <FaApple className="w-4 h-4 mr-2 text-gray-700" />
               macOS
-            </button>
+            </a>
           </div>
         </div>
 
