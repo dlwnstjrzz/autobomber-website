@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
+import Script from "next/script";
 
 const pretendard = localFont({
   src: "../../static/fonts/PretendardVariable.woff2",
@@ -21,6 +22,22 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
+      {/* Google tag (gtag.js) */}
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-61M8Y4ZSNE"
+          strategy="afterInteractive"
+          async
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-61M8Y4ZSNE');
+          `}
+        </Script>
+      </head>
       <body
         className={`${pretendard.variable} antialiased font-pretendard`}
         suppressHydrationWarning={true}
