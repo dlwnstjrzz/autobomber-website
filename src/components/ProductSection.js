@@ -307,6 +307,35 @@ export default function ProductSection() {
               ) : (
                 ""
               )}
+              {index + 1 === 6 ? (
+                <div className="items-center">
+                  <video
+                    src="/video/이웃커넥트서이추.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-auto cursor-pointer mt-[-2px]"
+                  ></video>
+                  <p className="text-base text-gray-500 font-semibold mt-3 mb-8 text-center">
+                    원하는 블로거의 이웃들을 자동 추가
+                  </p>
+
+                  <video
+                    src="/video/키워드검색서이추.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-auto cursor-pointer"
+                  ></video>
+                  <p className="text-base text-gray-500 font-semibold mt-3 mb-3 text-center">
+                    원하는 키워드와 연관된 이웃 추가
+                  </p>
+                </div>
+              ) : (
+                ""
+              )}
               {index + 1 === 19 ? (
                 <video
                   src="/video/상세페이지4.mp4"
