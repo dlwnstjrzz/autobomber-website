@@ -79,7 +79,7 @@ export default function ProductSection() {
   };
   return (
     <section
-      className="pt-0 pb-16 sm:py-16 bg-card sm:bg-[#1a1a1a]"
+      className="pt-0 pb-16 sm:py-16 bg-card bg-[#1a1a1a]"
       ref={planSectionRef}
     >
       <div className="mx-auto w-full max-w-7xl px-1 sm:px-4">
@@ -246,7 +246,7 @@ export default function ProductSection() {
         </div>
 
         {/* 상세 페이지 이미지들 */}
-        <div className="mt-16 space-y-4 -mx-1 sm:mx-auto sm:max-w-4xl sm:px-4">
+        <div className="mt-16 space-y-4 bg-[#1a1a1a] -mx-1 sm:mx-auto sm:max-w-4xl sm:px-4">
           {Array.from({ length: 20 }, (_, index) => (
             <div key={index + 1} className="w-full">
               <img
@@ -292,6 +292,21 @@ export default function ProductSection() {
                   playsInline
                   className="w-full h-auto cursor-pointer mt-[-2px]"
                 ></video>
+              ) : (
+                ""
+              )}
+              {index + 1 === 8 ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((seq) => (
+                    <img
+                      key={seq}
+                      src={`/image/blog_automation/상세페이지4-${seq}.png`}
+                      alt={`상품 상세 이미지 ${index + 1}`}
+                      className="block h-auto max-w-full mx-auto"
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
               ) : (
                 ""
               )}
