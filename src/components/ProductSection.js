@@ -249,10 +249,10 @@ export default function ProductSection() {
 
         {/* 상세 페이지 이미지들 */}
         <div className="mt-16 space-y-4 bg-[#1a1a1a] -mx-1 sm:mx-auto sm:max-w-4xl sm:px-4">
-          {Array.from({ length: 14 }, (_, index) => (
+          {Array.from({ length: 17 }, (_, index) => (
             <div key={index + 1} className="w-full">
               <img
-                src={`/image/blog_automation/자동화폭격기 최종_${
+                src={`/image/blog_automation/자동화 폭격기 찐 최종_${
                   index + 1
                 }.png`}
                 alt={`상품 상세 이미지 ${index + 1}`}
@@ -353,9 +353,22 @@ export default function ProductSection() {
               ) : (
                 ""
               )}
-              {index + 1 === 19 ? (
+              {index + 1 === 17 ? (
                 <video
                   src="/video/상세페이지4.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto cursor-pointer"
+                  onClick={scrollToPlans}
+                ></video>
+              ) : (
+                ""
+              )}
+              {index + 1 === 12 ? (
+                <video
+                  src="/video/상세페이지2.mp4"
                   autoPlay
                   loop
                   muted
