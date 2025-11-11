@@ -85,7 +85,12 @@ export function AuthProvider({ children }) {
     marketingEmail = false,
   }) => {
     try {
-      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const normalizedEmail = email.trim().toLowerCase();
+      const credential = await createUserWithEmailAndPassword(
+        auth,
+        normalizedEmail,
+        password
+      );
 
       if (name) {
         await updateProfile(credential.user, { displayName: name });
@@ -96,7 +101,7 @@ export function AuthProvider({ children }) {
         userDocRef,
         {
           uid: credential.user.uid,
-          email,
+          email: normalizedEmail,
           name: name || "",
           contact: contact || "",
           marketing: {

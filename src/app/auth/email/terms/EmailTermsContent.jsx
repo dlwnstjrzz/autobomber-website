@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -85,7 +85,6 @@ export default function EmailTermsContent() {
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-2xl mx-auto bg-card rounded-2xl shadow-lg p-8 space-y-8">
         <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground">이메일 회원가입</p>
           <h1 className="text-3xl font-bold text-card-foreground">약관 동의</h1>
           <p className="text-sm text-muted-foreground">
             서비스 이용을 위해 필요한 약관에 동의해주세요.
@@ -100,7 +99,9 @@ export default function EmailTermsContent() {
               onChange={handleToggleAll}
               className="h-4 w-4 rounded border-input text-[#0164FF] focus:ring-[#0164FF]"
             />
-            <span className="font-semibold text-card-foreground">전체 동의하기</span>
+            <span className="font-semibold text-card-foreground">
+              전체 동의하기
+            </span>
           </label>
 
           <AgreementItem

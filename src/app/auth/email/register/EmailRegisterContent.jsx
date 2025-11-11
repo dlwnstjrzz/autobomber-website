@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchSignInMethodsForEmail } from "firebase/auth";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useAuth } from "@/hooks/useAuth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 
 export default function EmailRegisterContent() {
   const router = useRouter();
@@ -48,14 +49,16 @@ export default function EmailRegisterContent() {
   };
 
   const handleEmailCheck = async () => {
-    if (!formData.email) {
+    const normalizedEmail = formData.email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
       setEmailCheckMessage("이메일을 입력한 뒤 중복 확인을 눌러주세요.");
       setEmailCheckStatus({ checked: false, available: false });
       return;
     }
 
     const emailPattern = /.+@.+\..+/;
-    if (!emailPattern.test(formData.email)) {
+    if (!emailPattern.test(normalizedEmail)) {
       setEmailCheckMessage("올바른 이메일 형식을 입력해주세요.");
       setEmailCheckStatus({ checked: false, available: false });
       return;
@@ -64,15 +67,26 @@ export default function EmailRegisterContent() {
     try {
       setEmailCheckLoading(true);
       setEmailCheckMessage("");
-      const methods = await fetchSignInMethodsForEmail(auth, formData.email);
-      const available = methods.length === 0;
+      const methods = await fetchSignInMethodsForEmail(auth, normalizedEmail);
+
+      const userQuery = query(
+        collection(db, "users"),
+        where("email", "==", normalizedEmail),
+        limit(1)
+      );
+      const userSnapshot = await getDocs(userQuery);
+
+      const existsInFirestore = !userSnapshot.empty;
+      const available = methods.length === 0 && !existsInFirestore;
       setEmailCheckStatus({ checked: true, available });
       setEmailCheckMessage(
         available ? "사용 가능한 이메일입니다." : "이미 가입된 이메일입니다."
       );
     } catch (checkError) {
       console.error("이메일 중복 확인 오류:", checkError);
-      setEmailCheckMessage("중복 확인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      setEmailCheckMessage(
+        "중복 확인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요."
+      );
       setEmailCheckStatus({ checked: false, available: false });
     } finally {
       setEmailCheckLoading(false);
@@ -82,8 +96,9 @@ export default function EmailRegisterContent() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const { email, password, name, contact } = formData;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    if (!email || !password || !name || !contact) {
+    if (!normalizedEmail || !password || !name || !contact) {
       setError("모든 정보를 빠짐없이 입력해주세요.");
       return;
     }
@@ -108,7 +123,7 @@ export default function EmailRegisterContent() {
       setIsSubmitting(true);
       setError("");
       await registerWithEmail({
-        email,
+        email: normalizedEmail,
         password,
         name,
         contact,
@@ -136,20 +151,9 @@ export default function EmailRegisterContent() {
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-2xl mx-auto bg-card rounded-2xl shadow-lg p-8 space-y-8">
         <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground">이메일 회원가입</p>
-          <h1 className="text-3xl font-bold text-card-foreground">가입 정보 입력</h1>
-          <p className="text-sm text-muted-foreground">
-            이메일, 비밀번호, 이름, 연락처 정보를 입력해주세요.
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-muted p-4 text-sm text-muted-foreground space-y-1">
-          <p>
-            메시지 수신 동의: <strong>{smsConsent ? "동의" : "미동의"}</strong>
-          </p>
-          <p>
-            이메일 수신 동의: <strong>{emailConsent ? "동의" : "미동의"}</strong>
-          </p>
+          <h1 className="text-3xl font-bold text-card-foreground">
+            가입 정보 입력
+          </h1>
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
@@ -205,7 +209,11 @@ export default function EmailRegisterContent() {
                 className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-card-foreground"
                 aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
               >
-                {showPassword ? <AiOutlineEye size={20} /> : <AiOutlineEyeInvisible size={20} />}
+                {showPassword ? (
+                  <AiOutlineEye size={20} />
+                ) : (
+                  <AiOutlineEyeInvisible size={20} />
+                )}
               </button>
             </div>
           </div>
@@ -227,9 +235,17 @@ export default function EmailRegisterContent() {
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-card-foreground"
-                aria-label={showConfirmPassword ? "비밀번호 확인 숨기기" : "비밀번호 확인 보기"}
+                aria-label={
+                  showConfirmPassword
+                    ? "비밀번호 확인 숨기기"
+                    : "비밀번호 확인 보기"
+                }
               >
-                {showConfirmPassword ? <AiOutlineEye size={20} /> : <AiOutlineEyeInvisible size={20} />}
+                {showConfirmPassword ? (
+                  <AiOutlineEye size={20} />
+                ) : (
+                  <AiOutlineEyeInvisible size={20} />
+                )}
               </button>
             </div>
           </div>

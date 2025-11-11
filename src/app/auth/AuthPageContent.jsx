@@ -257,7 +257,7 @@ export default function AuthPageContent() {
               <button
                 type="button"
                 onClick={goToEmailSignup}
-                className="text-xs underline text-muted-foreground hover:text-card-foreground"
+                className="text-sm underline text-muted-foreground hover:text-card-foreground"
               >
                 이메일로 회원가입
               </button>
