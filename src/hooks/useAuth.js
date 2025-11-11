@@ -4,9 +4,12 @@ import {
   signInWithPopup,
   signOut,
   onAuthStateChanged,
-  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { auth, googleProvider, db } from "@/lib/firebase";
 
 const AuthContext = createContext();
 
@@ -63,6 +66,55 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signInWithEmail = async (email, password) => {
+    try {
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      return credential.user;
+    } catch (error) {
+      console.error("이메일 로그인 오류:", error);
+      throw error;
+    }
+  };
+
+  const registerWithEmail = async ({
+    email,
+    password,
+    name,
+    contact,
+    marketingSms = false,
+    marketingEmail = false,
+  }) => {
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+
+      if (name) {
+        await updateProfile(credential.user, { displayName: name });
+      }
+
+      const userDocRef = doc(db, "users", credential.user.uid);
+      await setDoc(
+        userDocRef,
+        {
+          uid: credential.user.uid,
+          email,
+          name: name || "",
+          contact: contact || "",
+          marketing: {
+            sms: Boolean(marketingSms),
+            email: Boolean(marketingEmail),
+          },
+          createdAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      return credential.user;
+    } catch (error) {
+      console.error("이메일 회원가입 오류:", error);
+      throw error;
+    }
+  };
+
   const signInWithKakao = (redirectTo) => {
     // 카카오 로그인 페이지로 이동 (이전 페이지 정보 전달)
     let kakaoUrl = '/api/auth/kakao';
@@ -112,6 +164,8 @@ export function AuthProvider({ children }) {
     loading,
     signInWithGoogle,
     signInWithKakao,
+    signInWithEmail,
+    registerWithEmail,
     logout,
   };
 

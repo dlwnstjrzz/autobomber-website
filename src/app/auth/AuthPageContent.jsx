@@ -3,11 +3,23 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthPageContent() {
-  const { user, signInWithGoogle, signInWithKakao, logout } = useAuth();
+  const {
+    user,
+    signInWithGoogle,
+    signInWithKakao,
+    signInWithEmail,
+    logout,
+  } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [emailLoginLoading, setEmailLoginLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [showEmailPassword, setShowEmailPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectParam = searchParams.get("redirect");
@@ -36,6 +48,38 @@ export default function AuthPageContent() {
   const handleKakaoSignIn = () => {
     setIsLoading(true);
     signInWithKakao(redirectTarget || "/");
+  };
+
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    setEmailError("");
+
+    if (!email || !password) {
+      setEmailError("이메일과 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      setEmailLoginLoading(true);
+      await signInWithEmail(email, password);
+      router.push(redirectTarget || "/");
+    } catch (error) {
+      console.error("이메일 로그인 실패:", error);
+      const message =
+        error?.code === "auth/invalid-credential"
+          ? "이메일 또는 비밀번호가 올바르지 않습니다."
+          : "이메일 로그인에 실패했습니다. 다시 시도해주세요.";
+      setEmailError(message);
+    } finally {
+      setEmailLoginLoading(false);
+    }
+  };
+
+  const goToEmailSignup = () => {
+    const redirectSuffix = redirectTarget
+      ? `?redirect=${encodeURIComponent(redirectTarget)}`
+      : "";
+    router.push(`/auth/email/terms${redirectSuffix}`);
   };
 
   const handleLogout = async () => {
@@ -118,7 +162,7 @@ export default function AuthPageContent() {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
-                    <span>Google로 로그인</span>
+                    <span>Google로 로그인/회원가입</span>
                   </>
                 )}
               </button>
@@ -141,10 +185,81 @@ export default function AuthPageContent() {
                       className="w-5 h-5"
                     />
                     <span style={{ color: "rgba(0, 0, 0, 0.85)" }}>
-                      카카오 로그인
+                      카카오 로그인/회원가입
                     </span>
                   </>
                 )}
+              </button>
+            </div>
+
+            <div className="relative py-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-muted"></span>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  이메일로 로그인
+                </span>
+              </div>
+            </div>
+
+            <form className="space-y-4" onSubmit={handleEmailLogin}>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  이메일
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-input bg-background text-card-foreground focus:outline-none focus:ring-2 focus:ring-[#0164FF]/40"
+                  placeholder="example@email.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  비밀번호
+                </label>
+                <div className="relative">
+                  <input
+                    type={showEmailPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-input bg-background text-card-foreground focus:outline-none focus:ring-2 focus:ring-[#0164FF]/40 pr-12"
+                    placeholder="비밀번호를 입력하세요"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-card-foreground"
+                    aria-label={showEmailPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                  >
+                    {showEmailPassword ? <AiOutlineEye size={20} /> : <AiOutlineEyeInvisible size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              {emailError && (
+                <p className="text-sm text-red-600">{emailError}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={emailLoginLoading}
+                className="w-full bg-[#0164FF] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#0155d9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {emailLoginLoading ? "로그인 중..." : "이메일로 로그인"}
+              </button>
+            </form>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={goToEmailSignup}
+                className="text-xs underline text-muted-foreground hover:text-card-foreground"
+              >
+                이메일로 회원가입
               </button>
             </div>
 
