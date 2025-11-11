@@ -117,11 +117,13 @@ export default function ProductSection() {
             <div className="lg:w-[45%] flex flex-col justify-between">
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-card-foreground mb-3">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-card-foreground mb-3">
                     블로그 서이추 자동화 프로그램
                   </h2>
                   <p className="text-lg text-muted-foreground mb-4">
-                    네이버 블로거 1,000명이 선택한 서이추 자동화 프로그램 끝판왕
+                    서이추 자동화 프로그램 끝판왕
+                    <br />
+                    *2025.11.11 업데이트 완료
                   </p>
                 </div>
 
@@ -247,10 +249,10 @@ export default function ProductSection() {
 
         {/* 상세 페이지 이미지들 */}
         <div className="mt-16 space-y-4 bg-[#1a1a1a] -mx-1 sm:mx-auto sm:max-w-4xl sm:px-4">
-          {Array.from({ length: 20 }, (_, index) => (
+          {Array.from({ length: 14 }, (_, index) => (
             <div key={index + 1} className="w-full">
               <img
-                src={`/image/blog_automation/자동화 폭격기 최종 완성본_${
+                src={`/image/blog_automation/자동화폭격기 최종_${
                   index + 1
                 }.png`}
                 alt={`상품 상세 이미지 ${index + 1}`}
