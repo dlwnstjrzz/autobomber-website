@@ -20,7 +20,6 @@ export default function HomeWithDiscount() {
       setShowBanner(false);
     }
   }, [isEligible, discountData, loading]);
-
   return (
     <>
       <HeroSection />

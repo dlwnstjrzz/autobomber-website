@@ -7,6 +7,11 @@ import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import Script from "next/script";
+import KakaoChannelButton from "@/components/KakaoChannelButton";
+
+const kakaoJavascriptKey = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY;
+const kakaoSdkVersion = "2.7.9";
+const kakaoSdkIntegrity = process.env.NEXT_PUBLIC_KAKAO_SDK_INTEGRITY;
 
 const pretendard = localFont({
   src: "../../static/fonts/PretendardVariable.woff2",
@@ -29,6 +34,12 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
           async
         />
+        <Script
+          src={`https://t1.kakaocdn.net/kakao_js_sdk/${kakaoSdkVersion}/kakao.min.js`}
+          integrity={kakaoSdkIntegrity || undefined}
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
         <Script id="gtag-init" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
@@ -37,6 +48,18 @@ export default function RootLayout({ children }) {
             gtag('config', 'G-61M8Y4ZSNE');
           `}
         </Script>
+        {Boolean(kakaoJavascriptKey) && (
+          <Script id="kakao-sdk-init" strategy="afterInteractive">
+            {`
+              if (window.Kakao) {
+                if (!window.Kakao.isInitialized()) {
+                  window.Kakao.init(${JSON.stringify(kakaoJavascriptKey)});
+                }
+                console.log('Kakao SDK initialized:', window.Kakao.isInitialized());
+              }
+            `}
+          </Script>
+        )}
       </head>
       <body
         className={`${pretendard.variable} antialiased font-pretendard`}
@@ -56,6 +79,7 @@ export default function RootLayout({ children }) {
               <Footer />
             </div>
             <Toaster />
+            <KakaoChannelButton />
           </AuthProvider>
         </ThemeProvider>
       </body>
