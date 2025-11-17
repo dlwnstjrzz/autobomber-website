@@ -156,7 +156,7 @@ function PurchaseSuccessContent() {
                 📖 사용 가이드
               </h3>
               <Link
-                href="https://blog.naver.com/autobomber/223996758113"
+                href="https://blog.naver.com/autobomber/224072147316"
                 className="flex items-center justify-center w-full py-3 px-4 text-white rounded-lg hover:opacity-90 transition-all text-sm font-medium"
                 style={{ backgroundColor: "#615EFF" }}
               >

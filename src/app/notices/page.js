@@ -14,7 +14,7 @@ export default function NoticesPage() {
       date: today,
       isNew: true,
       category: "가이드",
-      url: "https://blog.naver.com/autobomber/223996758113",
+      url: "https://blog.naver.com/autobomber/224072147316",
     },
   ];
 

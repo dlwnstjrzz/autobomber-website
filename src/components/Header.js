@@ -80,7 +80,7 @@ export default function Header() {
               공지사항
             </Link>
             <Link
-              href="https://blog.naver.com/autobomber/223996758113"
+              href="https://blog.naver.com/autobomber/224072147316"
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground hover:text-primary transition-colors font-medium"
@@ -233,7 +233,7 @@ export default function Header() {
                 공지사항
               </Link>
               <Link
-                href="https://blog.naver.com/autobomber/223996758113"
+                href="https://blog.naver.com/autobomber/224072147316"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-foreground hover:text-primary transition-colors font-medium px-4 py-2"
