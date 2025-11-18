@@ -239,7 +239,7 @@ export default function ProductSection() {
                   {selectedPlan === "trial"
                     ? isStartingTrial
                       ? "체험 준비 중..."
-                      : "1일 무료로 체험하기"
+                      : "1일 무료 이용 코드 받기"
                     : "1년 이용권 구매하기"}
                 </button>
               </div>
